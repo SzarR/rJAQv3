@@ -1,14 +1,16 @@
-get_importance <- function(datum){
+get_importance <- function(datum) {
 
-  if("Importance" %in% Scale_Choices){
-
-    Task_IMP_Sum <- colMeans(datum[,paste0("IMP_", 1:TaskNumbers)][1:nrow(TaskNumbers)], na.rm=T)
-    Task_IMP_SD <- sapply(datum[,paste0("IMP_", 1:TaskNumbers)][1:nrow(TaskNumbers)], sd, 2)
-    
-    #Statements_Task <- cbind(Statements_Task, Task_IMP_Sum, Task_IMP_SD)
-    
-    return(Task_IMP_Sum)
-
-  }
+  # Specify variable names.
+  VarLab_IMP_Task <- paste0("IMP_", 1:TaskNumbers)
+  
+  # Meta-data stuff.
+  Max_IMP <<- max(datum[,VarLab_IMP_Task],na.rm=T)
+  
+  # Run calculations.
+  IMP <<- round(colMeans(datum[, VarLab_IMP_Task], na.rm = T), digits = 2)
+  IMP_SD <- round(sapply(datum[, VarLab_IMP_Task], sd, 2), digits = 2)
+  
+  # Save output.
+  Output.Frame <<- cbind(Output.Frame, IMP, IMP_SD)
   
 }

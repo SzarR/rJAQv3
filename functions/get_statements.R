@@ -25,10 +25,10 @@ get_statements <- function(datum){
   Number <- paste0(1:length(Description))
   
   #create new df.
-  KSA_Frame <- data.frame(Number,Description)
+  Description.Frame <<- data.frame(Number,Description)
   
   #Obtain numbers
-  TaskNumbers <<- nrow(KSA_Frame)
+  TaskNumbers <<- nrow(Description.Frame)
     
-  return(KSA_Frame)
+  return(Description.Frame)
 }

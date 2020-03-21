@@ -17,3 +17,9 @@ for (i in list.files('./functions/')) {
   rm(i)
 }
 
+# Read in Folder of Custom Modules --------------------------------------
+for (i in list.files('./modules/')) {
+  source(paste0('./modules/',i))
+  rm(i)
+}
+

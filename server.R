@@ -72,9 +72,9 @@ server <- function(input, output, session) {
     options = list(pageLength = 50,
                    autoWidth = TRUE))
   
-  # Analysis of Task JAQ Statements ----------------------------------
+# Analysis of Task JAQ Statements ----------------------------------
   Tasks_Analyzed <- eventReactive(input$Analyze_Stuff, {
-    get_importance(dat_task_renamed())
+    jaq_analyze(dat_task_renamed(),section = 'task')
   })
   
   # Display task analysis results.
@@ -87,6 +87,6 @@ server <- function(input, output, session) {
     server = TRUE,
     rownames = FALSE,
     options = list(pageLength = 50,
-                   autoWidth = FALSE))
+                   autoWidth = TRUE))
 
 } # Server close.

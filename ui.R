@@ -4,7 +4,7 @@ ui <-
     selected = "Task Analysis",
     windowTitle = "rJAQv3",
     inverse = TRUE,
-    theme = shinytheme("superhero"),
+    theme = shinytheme("yeti"),
     
     tabPanel(
       tags$strong(h3("Job Analysis Initilization Panel")),
@@ -49,13 +49,13 @@ ui <-
           br(),
           br(),
           actionButton(inputId = "Parse_Tasks",label = "Extract Task Statements", width = 225,
-                       style="color: #fff; background-color: #df691a; border-color: #2e6da4"),
+                       ),
           br(),
           h3("Variable Renamer"),
           "In the fields below, please indicate the variable in the SPSS file name that corresponds to
           NA_1, and again, indicate the last task statement that must be renamed, for example, REQU_194.",
-          textInput("rename_begin", label = "", placeholder = "Paste firt task variable name", width = 225),
-          textInput("rename_end", label = "", placeholder = "Paste last task variable name", width = 225),
+          textInput("rename_begin", label = "", placeholder = "Paste firt task variable name",value = "q0011_0001_0001", width = 225),
+          textInput("rename_end", label = "", placeholder = "Paste last task variable name", value = "q0021_0008_0004", width = 225),
           "In the table below, please indicate which scales have been  utilized for the JAQ. Select all
           that apply.",
           br(),
@@ -78,8 +78,7 @@ ui <-
           actionButton(
             inputId = "Rename_Variables",
             label = "Rename Variables",
-            width = 170,
-            style = "color: #fff; background-color: #df691a; border-color: #2e6da4"
+            width = 170
           ), 
           h3("Quality Control"),
           checkboxGroupInput(
@@ -95,8 +94,7 @@ ui <-
           actionButton(
             inputId = "Analyze_Stuff",
             label = "Analyze!",
-            width = 170,
-            style = "color: #fff; background-color: #df691a; border-color: #2e6da4"
+            width = 170
           )), 
         mainPanel(tabsetPanel(type = "tabs",
                               tabPanel("Raw Data",  DT::dataTableOutput("table_task")),
