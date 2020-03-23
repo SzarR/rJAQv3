@@ -65,10 +65,10 @@ ui <-
             'Scale_Choices',
             label = NULL,
             choices = c(
-              "Applicability",
-              "Importance",
-              "Frequency",
-              "Required upon Promotion"
+              "APP",
+              "IMP",
+              "FREQ",
+              "REQU"
             ),
             selected = NULL,
             width = 340,
@@ -104,6 +104,82 @@ ui <-
                               ))
         ) #sidebar layout
         
+    ), #tab panel
+    
+    tabPanel(
+      title = "KSAO Analysis",
+      sidebarLayout(
+        sidebarPanel(
+          "Please upload a valid SPSS file below. The file should be a direct download from the
+          Survey Monkey website. Leave the raw variable labels and confirm the pre-filled areas
+          below match your particular survey upload.",
+          fileInput(inputId = "ksao", label = "", accept = ".sav",width = 475, 
+                    placeholder = "Upload a valid SPSS file"),
+          "Click the button below to allow R to extract statements from the Value Label variable
+          column from the SPSS file. Caution, if the length exceeds 325 characters, the statement
+          will be cut off.",
+          br(),
+          br(),
+          actionButton(inputId = "Parse_KSAO",label = "Extract KSAO Statements", width = 225,
+          ),
+          br(),
+          h3("Variable Renamer"),
+          "In the fields below, please indicate the variable in the SPSS file name that corresponds to
+          the applicability scale for the first SAO statement and the last SAO statement.",
+          textInput("rename_begin_sao", label = "", placeholder = "Paste firt task variable name",value = "q0011_0001_0001", width = 225),
+          textInput("rename_end_sao", label = "", placeholder = "Paste last task variable name", value = "q0022_0006_0004", width = 225),
+          "In the field below, please indicate the variable in the SPSS file that corresponds to
+          the first knowledge area in your file",
+          textInput("rename_begin_know", label = "", placeholder = "Paste firt task variable name",value = "q0023_0001_0001", width = 225),
+          textInput("rename_end_know", label = "", placeholder = "Paste last task variable name", value = "q0031_0004_0005", width = 225),
+          "In the table below, please indicate which scales have been  utilized for the JAQ. Select all
+          that apply.",
+          br(),
+          br(),
+          selectizeInput(
+            'Scale_Choices_ksao',
+            label = NULL,
+            choices = c(
+              "APP",
+              "IMP",
+              "REQU",
+              "DIFF",
+              "RvR"
+            ),
+            selected = NULL,
+            width = 340,
+            options = list(create = TRUE, maxItems = 5)
+          ),
+          actionButton(
+            inputId = "Rename_Variables_KSAO",
+            label = "Rename Variables",
+            width = 220
+          ), 
+          # h3("Quality Control"),
+          # checkboxGroupInput(
+          #   "checkGroup",
+          #   label = "",
+          #   choices = list(
+          #     "Quality Control Checkpoint #1" = 1,
+          #     "Quality Control Checkpoint #2" = 2,
+          #     "Quality Control Checkpoint #3" = 3
+          #   ),
+          #   selected = NULL
+          # ),
+          actionButton(
+            inputId = "Analyze_Stuff_ksao",
+            label = "Analyze!",
+            width = 170
+          )), 
+        mainPanel(tabsetPanel(type = "tabs",
+                              tabPanel("Raw Data",  DT::dataTableOutput("table_ksao")),
+                              tabPanel("KSAO Statements", DT::dataTableOutput("pr_statements_ksao")),
+                              tabPanel("Renamed Data",  DT::dataTableOutput("renamed_ksao")),
+                              tabPanel("KSAO Results", DT::dataTableOutput("pr_ksao_analysis"))
+        ))
+      ) #sidebar layout
+      
     ) #tab panel
+    
     
   ) #overall UI

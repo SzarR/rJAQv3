@@ -24,11 +24,9 @@ get_composite <- function(datum){
   ESS <- round(colMeans(Essentiality_Frame, na.rm=T) * 100, digits = 2)
   ESS_SD <- round(sapply(Essentiality_Frame, sd, 2), digits = 2)
 
-  Output.Frame <<- cbind(Output.Frame, COMP, COMP_SD, ESS, ESS_SD)
+  Output.Frame.Task <<- cbind(Output.Frame.Task, COMP, COMP_SD, ESS, ESS_SD)
   
-  if("Frequency" %in% Scale_Choices) {
-    
-    ZONE    <- ifelse(APP >= 66.67 & ESS >= 66.67, 1.1,
+  ZONE <- ifelse(APP >= 66.67 & ESS >= 66.67, 1.1,
                 ifelse((APP >= 66.67 & ESS >= 50.00 & ESS < 66.67), 1.2,
                 ifelse((APP >= 50.00 & APP < 66.67 & ESS >= 66.67), 1.3,
                 ifelse((APP >= 50.00 & APP < 66.67 & ESS >= 50.00 & ESS < 66.67), 1.4,
@@ -46,6 +44,5 @@ get_composite <- function(datum){
                 ifelse((APP >= 0 & APP < 33.33 & ESS >= 0 & ESS < 33.33), 4.4, NA
                 )))))))))))))))) #BOOM Matrix created by Bob. 
     
-    Output.Frame <<- cbind(Output.Frame, ZONE)
-  }
+    Output.Frame.Task <<- cbind(Output.Frame.Task, ZONE)
 }

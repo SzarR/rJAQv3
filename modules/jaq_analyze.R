@@ -1,38 +1,60 @@
 jaq_analyze <- function(datum, section) {
 
-# Specify section conditions: task/ksa/link. ------------------------------
-  # if (section == "task") {
-  #   Scale_Choices = Scale_Choices
-  # } else if (section == "ksa") {
-  #   Scale_Choices = KSA_Scale_Choices
-  # } else if (section == "link") {
-  #   Scale_Choices = Link_Scale_Choices
-  # }
-  
-# Output container --------------------------------------------------------
-  Output.Frame <<- data.frame(Description.Frame)
-  
-    if ("Applicability" %in% Scale_Choices) {
-      get_applicability(dat_task_renamed())
-    }
+  if(section =='task'){
     
-    if ("Importance" %in% Scale_Choices) {
-      get_importance(dat_task_renamed())
+    # Output container --------------------------------------------------------
+    Output.Frame.Task <<- data.frame(Description.Frame)
+
+    if ("APP" %in% Scale_Choices) {
+      get_applicability(dat_task_renamed(), section = 'task')
     }
 
-    if ("Frequency" %in% Scale_Choices) {
+    if ("IMP" %in% Scale_Choices) {
+      get_importance(dat_task_renamed(), section = 'task')
+    }
+    
+    if ("FREQ" %in% Scale_Choices) {
       get_frequency(dat_task_renamed())
     }
 
-    if ("Required upon Promotion" %in% Scale_Choices) {
-      get_required(dat_task_renamed())
+    if ("REQU" %in% Scale_Choices) {
+      get_required(dat_task_renamed(), section = 'task')
     }
-  
-  # Run final calculations for composite/essentiality.
-  # Frequency NOT in KSAO frame.
-  if ("Frequency" %in% Scale_Choices) {
-    get_composite(dat_task_renamed())
+
+    if ("IMP" %in% Scale_Choices & "FREQ" %in% Scale_Choices){
+      get_composite(dat_task_renamed())
+    }
+    
+    return(Output.Frame.Task)
+    
   }
   
-  return(Output.Frame)
+  if (section == 'ksao') {
+    
+    Output.Frame.KSAO <<- data.frame(Description.Frame)
+    
+    if ("APP" %in% Scale_Choices_ksao) {
+      get_applicability(dat_ksao_renamed(), section = 'ksao')
+    }
+    
+    if ("IMP" %in% Scale_Choices_ksao) {
+      get_importance(dat_ksao_renamed(), section = 'ksao')
+    }
+    
+    if ("REQU" %in% Scale_Choices_ksao) {
+      get_required(dat_ksao_renamed(), section = 'ksao')
+    }
+    
+    if ("DIFF" %in% Scale_Choices_ksao) {
+      get_differentiation(dat_ksao_renamed())
+    }
+    
+    if ("RvR" %in% Scale_Choices_ksao) {
+      get_rvr(dat_ksao_renamed())
+    }
+    
+    return(Output.Frame.KSAO)
+    
   }
+  
+}

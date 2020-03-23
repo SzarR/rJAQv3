@@ -1,4 +1,4 @@
-get_statements <- function(datum){
+get_statements <- function(datum, section) {
   
   # Written by Alexa.
   # This function takes a given SPSS file from Survey Monkey
@@ -28,7 +28,13 @@ get_statements <- function(datum){
   Description.Frame <<- data.frame(Number,Description)
   
   #Obtain numbers
-  TaskNumbers <<- nrow(Description.Frame)
-    
+  if (section == 'task') {
+    TaskNumbers <<- nrow(Description.Frame)
+  }
+  
+  if (section == 'ksao') {
+    KSAONumbers <<- nrow(Description.Frame)
+  }
+  
   return(Description.Frame)
 }

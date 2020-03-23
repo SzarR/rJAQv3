@@ -2,13 +2,13 @@ server <- function(input, output, session) {
 
 # Task Analysis Panel -----------------------------------------------------
 
-# Upload SM SPSS File -----------------------------------------------------
+# Upload Task SPSS File -----------------------------------------------------
 
   dat_task <- reactive({
     if(is.null(input$task)) return(NULL)
     haven::read_sav(input$task$datapath)
   })
-
+ 
   # Display Raw SPSS File Table.
   output$table_task <-
     DT::renderDataTable({
@@ -18,7 +18,7 @@ server <- function(input, output, session) {
     server = TRUE,
     options = list(pageLength = 25,
                    autoWidth = TRUE))
-
+  
 # Renaming SPSS File Variable Names ---------------------------------------
   
   # Obtain start of rename column.
@@ -38,7 +38,7 @@ server <- function(input, output, session) {
 
   # Re-name variables.
   dat_task_renamed <<- eventReactive(input$Rename_Variables, {
-    rename_variables(dat_task())
+    rename_variables(dat_task(),section = 'task',knowledge = FALSE)
   })
   
   # Display re-named variables
@@ -55,9 +55,9 @@ server <- function(input, output, session) {
 
 # Parse Task Statements from SPSS Labels ----------------------------------
 
-  # Extract labels from SPSS file.
+  # Extract task labels from SPSS file.
   Statements_Task <<- eventReactive(input$Parse_Tasks, {
-    get_statements(dat_task())
+    get_statements(dat_task(), section = 'task')
   })
 
   # Display Task Statements/Description.
@@ -81,6 +81,99 @@ server <- function(input, output, session) {
   output$pr_task_analysis <-
     DT::renderDataTable({
       Tasks_Analyzed()
+    },
+    style = "bootstrap",
+    editable = 'cell',
+    server = TRUE,
+    rownames = FALSE,
+    options = list(pageLength = 50,
+                   autoWidth = TRUE))
+  
+# KSAO Analysis Panel ---------------------------------------------
+  
+  # Obtain start of SAO rename column.
+  observeEvent(input$rename_begin_sao, {
+    rename_begin_sao <<- input$rename_begin_sao
+  })
+  
+  # Obtain end of SAO rename column.
+  observeEvent(input$rename_end_sao, {
+    rename_end_sao <<- input$rename_end_sao
+  })
+  
+  # Obtain start of rename column for knowledge.
+  observeEvent(input$rename_begin_know, {
+    rename_begin_know <<- input$rename_begin_know
+  })
+  
+  # Obtain end of rename column for knowledge.
+  observeEvent(input$rename_end_know, {
+    rename_end_know<<- input$rename_end_know
+  })
+  
+  # Obtain scales utilized.
+  observeEvent(input$Scale_Choices_ksao, {
+    Scale_Choices_ksao <<- input$Scale_Choices_ksao
+  })
+  
+  # Extract KSAO labels from SPSS file.
+  Statements_KSAO <<- eventReactive(input$Parse_KSAO, {
+    get_statements(dat_ksao(),section = 'ksao')
+  })
+  
+  dat_ksao <- reactive({
+    if(is.null(input$ksao)) return(NULL)
+    haven::read_sav(input$ksao$datapath)
+  })
+  
+  # Display Raw SPSS File Table.
+  output$table_ksao <-
+    DT::renderDataTable({
+      dat_ksao()
+    },
+    style = "bootstrap",
+    server = TRUE,
+    options = list(pageLength = 25,
+                   autoWidth = TRUE))
+  
+  # Display KSAO Statements/Description.
+  output$pr_statements_ksao <-
+    DT::renderDataTable({
+      Statements_KSAO()
+    },
+    style = "bootstrap",
+    editable = 'cell',
+    server = TRUE,
+    rownames = FALSE,
+    options = list(pageLength = 50,
+                   autoWidth = TRUE))
+  
+  # Display re-named variables
+  output$renamed_ksao <-
+    DT::renderDataTable({
+      dat_ksao_renamed()
+    },
+    style = "bootstrap",
+    editable = 'cell',
+    server = TRUE,
+    rownames = FALSE,
+    options = list(pageLength = 50,
+                   autoWidth = TRUE))
+
+  # Re-name variables.
+  dat_ksao_renamed <<- eventReactive(input$Rename_Variables_KSAO, {
+    rename_variables(dat_ksao(), section = 'ksao', knowledge = TRUE) #Knowledge statements attached? That will trigger the KNOW argument.
+  })
+
+  # Analysis of KSAO JAQ Statements ----------------------------------
+  KSAOs_Analyzed <- eventReactive(input$Analyze_Stuff_ksao, {
+    jaq_analyze(dat_ksao_renamed(), section = 'ksao')
+  })
+
+  # Display KSAO analysis results.
+  output$pr_ksao_analysis <-
+    DT::renderDataTable({
+      KSAOs_Analyzed()
     },
     style = "bootstrap",
     editable = 'cell',

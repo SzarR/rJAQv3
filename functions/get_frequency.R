@@ -1,8 +1,11 @@
 get_frequency <- function(datum) {
   
+  # Do not need section argument as no
+  # frequency for KSAO statements.
+  
   # Specify variable names.
   VarLab_FREQ_Task <<- paste0("FREQ_", 1:TaskNumbers)
-  
+
   # Meta-data stuff.
   Max_FREQ <<- max(datum[,VarLab_FREQ_Task],na.rm=T)
   
@@ -11,6 +14,6 @@ get_frequency <- function(datum) {
   FREQ_SD <- round(sapply(datum[, VarLab_FREQ_Task], sd, 2), digits = 2)
   
   # Save output.
-  Output.Frame <<- cbind(Output.Frame, FREQ, FREQ_SD)
-  
+  Output.Frame.Task <<- cbind(Output.Frame.Task, FREQ, FREQ_SD)
+
 }

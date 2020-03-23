@@ -1,18 +1,28 @@
-get_required <- function(datum) {
+get_required <- function(datum, section) {
 
   # Specify variable names.
+  if(section == 'task'){
   VarLab_REQU_Task <- paste0("REQU_", 1:TaskNumbers)
-
-  # Run calculations.
-  REQU <-
-    round((apply(datum[, VarLab_REQU_Task], 2, function(x)
-      (sum(x == 1, na.rm = T)) / (sum(x == 2, na.rm = T) + sum(x == 1, na.rm =
-                                                                 T))) * 100), digits = 2)
-  REQU_SD <- round(sapply(datum[, VarLab_REQU_Task], sd, 2), digits = 2)
+  }
   
-  # Save output.
-  Output.Frame <<- cbind(Output.Frame, REQU, REQU_SD)
+  if(section == 'ksao'){
+  VarLab_REQU_Task <- paste0("REQU_", 1:KSAONumbers)
+  }
+  
+  # Run calculations.
+  REQU <- dichot_scale(datum, scale = VarLab_REQU_Task, rounding = 2)
+  
+  REQU_SD <- standard_deviation(datum, scale = VarLab_REQU_Task, rounding = 2)
 
+  # Save output.
+  if(section == 'task'){
+  Output.Frame.Task <<- cbind(Output.Frame.Task, REQU, REQU_SD)
+  }
+  
+  if(section == 'ksao'){
+  Output.Frame.KSAO <<- cbind(Output.Frame.KSAO, REQU, REQU_SD)
+    
+  }
 }
 
 
