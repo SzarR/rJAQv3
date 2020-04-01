@@ -13,28 +13,29 @@ get_statements <- function(datum, section) {
     select(Number) %>% 
     get_label() %>% 
     unname() 
-  
+
   #remove number from beginning of label
   Description <- gsub("^\\d+","",Description)
-  
+
   #remove tab or space from beginning of label
   Description <- gsub("^\\t|^\\s","",Description)
-  
+
   #remove everything from last " - " on
   Description <- gsub("(.*)\\s-\\s.*","\\1",Description)
   Number <- paste0(1:length(Description))
-  
+
   #create new df.
   Description.Frame <<- data.frame(Number,Description)
-  
+
   #Obtain numbers
   if (section == 'task') {
     TaskNumbers <<- nrow(Description.Frame)
   }
-  
+
   if (section == 'ksao') {
     KSAONumbers <<- nrow(Description.Frame)
   }
-  
+
   return(Description.Frame)
+
 }

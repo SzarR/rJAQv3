@@ -10,7 +10,7 @@ get_frequency <- function(datum) {
   Max_FREQ <<- max(datum[,VarLab_FREQ_Task],na.rm=T)
   
   # Run calculations.
-  FREQ <- round(colMeans(datum[, VarLab_FREQ_Task], na.rm = T), digits = 2)
+  FREQ <- likert_scale(datum, VarLab_FREQ_Task, rounding = 2)
   FREQ_SD <- round(sapply(datum[, VarLab_FREQ_Task], sd, 2), digits = 2)
   
   # Save output.

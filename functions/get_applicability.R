@@ -10,10 +10,7 @@ get_applicability <- function(datum, section) {
   }
   
   # Run calculations.
-  APP <<-
-    round((apply(datum[, VarLab_NA_Task], 2, function(x)
-      (sum(x == 1, na.rm = T)) / (sum(x == 2, na.rm = T) + sum(x == 1, na.rm =
-                                                                 T))) * 100), digits = 2)
+  APP <<- dichot_scale(datum, scale = VarLab_NA_Task,yes = 1,no = 2,rounding = 2)
   APP_SD <- round(sapply(datum[, VarLab_NA_Task], sd, 2), digits = 2)
   
   if(section == 'task'){

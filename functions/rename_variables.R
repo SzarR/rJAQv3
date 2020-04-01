@@ -103,7 +103,41 @@ rename_variables <- function(datum, section, knowledge){
       colnames(datum)[First_Know_Location:Last_Know_Location] <- Know_NewVariable_Names
     }
   }
-  
+
+  if(section == 'link'){
+    
+    # FLAG. How about Knowledge Yes but SAO No?
+
+    First_LinkSAO_Location <<- which(colnames(datum) == rename_begin_link_sao) 
+    Last_LinkSAO_Location <<- which(colnames(datum) == rename_end_link_sao)
+
+    Link_SAONumbers <<- (Last_LinkSAO_Location - First_LinkSAO_Location + 1)
+    SAONumbersForLinkage <<- Link_SAONumbers / DutyAreaCount
+
+    LinkStatementNames_SAO <<- paste0("SAAL_IMP_", 1:Link_SAONumbers)
+
+    colnames(datum)[First_LinkSAO_Location:Last_LinkSAO_Location] <- LinkStatementNames_SAO
+
+    if(knowledge == TRUE){
+
+      # The assumption here is that Know is after SAO. Further coding would be
+      # required if that is NOT the case.
+      First_LinkKNOW_Location <<- which(colnames(datum) == rename_begin_link_know) 
+      Last_LinkKNOW_Location <<- which(colnames(datum) == rename_end_link_know)
+
+      Link_KnowNumbers <<- (Last_LinkKNOW_Location - First_LinkKNOW_Location + 1)
+      KnowNumbersForLinkage <<- Link_KnowNumbers / DutyAreaCount
+      
+      LinkStatementNames_KNOW <<- paste0("JDKL_IMP_", 1:Link_KnowNumbers)
+      
+      NewVariable_Names <- c(LinkStatementNames_SAO, LinkStatementNames_KNOW) 
+
+      colnames(datum)[First_LinkSAO_Location:Last_LinkKNOW_Location] <- NewVariable_Names
+ 
+    }     
+
+  }
+
   return(datum)
-  
+
 }
