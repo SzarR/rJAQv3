@@ -1,4 +1,4 @@
-rename_variables <- function(datum, section, knowledge){
+rename_variables <- function(datum, section, knowledge=FALSE){
   
   # Written by RWS
   # This function takes a user settable first variable name

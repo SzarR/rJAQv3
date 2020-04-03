@@ -1,17 +1,29 @@
-tserver <- function(input, output, session) {
+server <- function(input, output, session) {
 
 # Task Analysis Panel -----------------------------------------------------
 # Upload Task SPSS File -----------------------------------------------------
+  values <<- reactiveValues(dat_task = NULL)
+  
+  observeEvent(input$task, {
 
-  dat_task <- reactive({
-    if(is.null(input$task)) return(NULL)
-    haven::read_sav(input$task$datapath)
+    req(input$rename_begin, input$rename_end)
+    
+    # If only SAO Present, then this.
+    if (input$dutyarea_begin != "") {
+      values$dat_task <- haven::read_sav(input$task$datapath) %>%
+        dplyr::select(rename_begin:rename_end, dutyarea_begin:dutyarea_end)
+      
+      # If only KNOW present, then this.
+    } else {
+      values$dat_task <- haven::read_sav(input$task$datapath) %>%
+        dplyr::select(rename_begin:rename_end)
+    }
   })
  
   # Display Raw SPSS File Table.
-  output$table_task <-
+  output$pr_table_task <-
     DT::renderDataTable({
-      dat_task()
+      values$dat_task
     },
     style = "bootstrap",
     server = TRUE,
@@ -35,28 +47,16 @@ tserver <- function(input, output, session) {
     Scale_Choices <<- input$Scale_Choices
   })
 
-  # Re-name variables.
-  dat_task_renamed <<- eventReactive(input$Rename_Variables, {
-    rename_variables(dat_task(),section = 'task', knowledge = FALSE)
+  observeEvent(input$Rename_Variables, {
+    temp <- rename_variables(values$dat_task, section = 'task')
+    values$dat_task <- temp
   })
   
-  # Display re-named variables
-  output$renamed_tasks <-
-    DT::renderDataTable({
-      dat_task_renamed()
-    },
-    style = "bootstrap",
-    editable = 'cell',
-    server = TRUE,
-    rownames = FALSE,
-    options = list(pageLength = 50,
-                   autoWidth = TRUE))
-
 # Parse Task Statements from SPSS Labels ----------------------------------
 
   # Extract task labels from SPSS file.
   Statements_Task <<- eventReactive(input$Parse_Tasks, {
-    get_statements(dat_task(), section = 'task')
+    get_statements(values$dat_task, section = 'task')
   })
 
   # Display Task Statements/Description.
@@ -72,10 +72,18 @@ tserver <- function(input, output, session) {
                    autoWidth = TRUE))
   
 # Analysis of Task JAQ Statements ----------------------------------
-  Tasks_Analyzed <- eventReactive(input$Analyze_Stuff, {
-    jaq_analyze(dat_task_renamed(),section = 'task')
+  observeEvent(input$QC1_Task, {
+    QC1_Task <<- input$QC1_Task
   })
-  
+
+  Tasks_Analyzed <- eventReactive(input$Analyze_Stuff, {
+
+    if(QC1_Task == TRUE){
+      values$dat_task <- qualitycontrol_step1(datum = values$dat_task, section = 'task')
+    }
+    jaq_analyze(values$dat_task, section = 'task')
+  })
+
   # Display task analysis results.
   output$pr_task_analysis <-
     DT::renderDataTable({
@@ -89,6 +97,9 @@ tserver <- function(input, output, session) {
                    autoWidth = TRUE))
   
 # KSAO Analysis Panel ---------------------------------------------
+  observeEvent(input$QC1_KSAO, {
+    QC1_KSAO <<- input$QC1_KSAO
+  })
   
   # Obtain start of SAO rename column.
   observeEvent(input$rename_begin_sao, {
@@ -114,21 +125,49 @@ tserver <- function(input, output, session) {
   observeEvent(input$Scale_Choices_ksao, {
     Scale_Choices_ksao <<- input$Scale_Choices_ksao
   })
-  
+
   # Extract KSAO labels from SPSS file.
   Statements_KSAO <<- eventReactive(input$Parse_KSAO, {
-    get_statements(dat_ksao(),section = 'ksao')
+    get_statements(values$dat_ksao,section = 'ksao')
   })
   
-  dat_ksao <- reactive({
-    if(is.null(input$ksao)) return(NULL)
-    haven::read_sav(input$ksao$datapath)
+  observeEvent(input$ksao, {
+    
+    # FLAG Does not work :(
+    # Validate function.
+    #req(input$rename_begin_sao, input$rename_begin_know)
+
+    # FLAG! Update this for task analysis chapter upload too.
+    # Must specify the column names before uploading the file here!
+    # To accurately parse out the KSAO statements from the task 
+    # statements. Should we back-apply to this to the task upload
+    # as well?
+    
+    # If Knowledge + SAO Present in SAO Analysis, then this.
+    if (input$rename_begin_sao != "" &
+        input$rename_begin_know != "") {
+      values$dat_ksao <- haven::read_sav(input$ksao$datapath) %>%
+        dplyr::select(rename_begin_sao:rename_end_sao,
+                      rename_begin_know:rename_end_know)
+    
+    # If only SAO Present, then this.
+    } else if (input$rename_begin_sao != "" &
+               input$rename_begin_know == "") {
+      values$dat_ksao <- haven::read_sav(input$ksao$datapath) %>%
+        dplyr::select(rename_begin_sao:rename_end_sao)
+    
+    # If only KNOW present, then this.  
+    } else if (input$rename_begin_know != "" &
+               input$rename_begin_sao == "") {
+      values$dat_ksao <- haven::read_sav(input$ksao$datapath) %>%
+        dplyr::select(rename_begin_know:rename_end_know)
+    }
   })
   
-  # Display Raw SPSS File Table.
-  output$table_ksao <-
+  # Display KSAO Table
+  output$pr_table_ksao <-
     DT::renderDataTable({
-      dat_ksao()
+      values$dat_ksao
     },
     style = "bootstrap",
     server = TRUE,
@@ -146,27 +185,22 @@ tserver <- function(input, output, session) {
     rownames = FALSE,
     options = list(pageLength = 50,
                    autoWidth = TRUE))
-  
-  # Display re-named variables
-  output$renamed_ksao <-
-    DT::renderDataTable({
-      dat_ksao_renamed()
-    },
-    style = "bootstrap",
-    editable = 'cell',
-    server = TRUE,
-    rownames = FALSE,
-    options = list(pageLength = 50,
-                   autoWidth = TRUE))
 
-  # Re-name variables.
-  dat_ksao_renamed <<- eventReactive(input$Rename_Variables_KSAO, {
-    rename_variables(dat_ksao(), section = 'ksao', knowledge = TRUE) #Knowledge statements attached? That will trigger the KNOW argument.
+  # FLAG create an ifelse for Knowledge = TRUE based on whether
+  # data in the knowledge fields of KSAO analysis chapter.
+  observeEvent(input$Rename_Variables_KSAO, {
+    temp <- rename_variables(values$dat_ksao, section = 'ksao', knowledge = TRUE)
+    values$dat_ksao <- temp
   })
-
-  # Analysis of KSAO JAQ Statements ----------------------------------
+  
+  # Analysis of KSAO Statements ----------------------------------
   KSAOs_Analyzed <- eventReactive(input$Analyze_Stuff_ksao, {
-    jaq_analyze(dat_ksao_renamed(), section = 'ksao')
+    
+    # First check if QC1_KSAO active
+    if(QC1_KSAO == TRUE){
+    values$dat_ksao <- qualitycontrol_step1(datum = values$dat_ksao, section = 'ksao')
+     }
+    jaq_analyze(values$dat_ksao, section = 'ksao')
   })
 
   # Display KSAO analysis results.
@@ -181,27 +215,24 @@ tserver <- function(input, output, session) {
     options = list(pageLength = 50,
                    autoWidth = TRUE))
 
-
-
-
 # Duty Area Panel ---------------------------------------------------------
 
 # Get duty area weightings
   DutyAreas <- eventReactive(input$Calculate_Weights, {
-    get_weightings(dat_task())
+    get_weightings(values$dat_task)
   })
   
-  # Obtain start of rename column.
+  # Obtain start of rename column for duty areas
   observeEvent(input$dutyarea_begin, {
     dutyarea_begin <<- input$dutyarea_begin
   })
   
-  # Obtain end of rename column.
+  # Obtain end of rename column for duty areas
   observeEvent(input$dutyarea_end, {
     dutyarea_end <<- input$dutyarea_end
   })
   
-  output$test_1 <- DT::renderDataTable({
+  output$pr_dutyarea_weightings <- DT::renderDataTable({
     DutyAreas()
   },
   style = "bootstrap",
@@ -232,69 +263,76 @@ tserver <- function(input, output, session) {
 # Linkage Analysis Panel --------------------------------------------------
   
 # Upload link SPSS File -----------------------------------------------------
-  
-  dat_link <- reactive({
-    if(is.null(input$link)) return(NULL)
-    haven::read_sav(input$link$datapath)
+  # 
+  # dat_link <- reactive({
+  #   if(is.null(input$link)) return(NULL)
+  #   haven::read_sav(input$link$datapath)
+  # })
+
+  observeEvent(input$link, {
+
+    if (input$rename_begin_link_sao != "" &
+        input$rename_begin_link_know != "") {
+      values$dat_link <- haven::read_sav(input$link$datapath) %>%
+        dplyr::select(rename_begin_link_sao:rename_end_link_sao,
+                      rename_begin_link_know:rename_end_link_know)
+
+      # If only Skil/Abil Present, then this.
+    } else if (input$rename_begin_link_sao != "" &
+               input$rename_begin_link_know == "") {
+      values$dat_link <- haven::read_sav(input$link$datapath) %>%
+        dplyr::select(rename_begin_link_sao:rename_end_link_sao)
+
+      # If only Knowledge present, then this.  
+    } else if (input$rename_begin_link_know != "" &
+               input$rename_begin_link_sao == "") {
+      values$dat_link <- haven::read_sav(input$link$datapath) %>%
+        dplyr::select(rename_begin_link_know:rename_end_link_know)
+    }
   })
   
   # Display Raw SPSS File Table.
-  output$table_link <-
+  output$pr_table_link <-
     DT::renderDataTable({
-      dat_link()
+      values$dat_link
     },
     style = "bootstrap",
     server = TRUE,
     options = list(pageLength = 25,
                    autoWidth = TRUE))
   
-  # Obtain end of rename column.
+  # Obtain first column of SAAL Linkage
   observeEvent(input$rename_begin_link_sao, {
     rename_begin_link_sao <<- input$rename_begin_link_sao
   })
   
-  # Obtain end of rename column.
+  # Obtain last column of SAAL Linkage
   observeEvent(input$rename_end_link_sao, {
     rename_end_link_sao <<- input$rename_end_link_sao
   })
   
-  # Obtain end of rename column.
+  # Obtain first column of KNOW Linkage
   observeEvent(input$rename_begin_link_know, {
     rename_begin_link_know <<- input$rename_begin_link_know
   })
   
-  # Obtain end of rename column.
+  # Obtain first column of KNOW Linkage
   observeEvent(input$rename_end_link_know, {
     rename_end_link_know <<- input$rename_end_link_know
   })
-  
-  # # Extract link labels from SPSS file.
-  # Statements_link <<- eventReactive(input$Parse_link, {
-  #   get_statements(dat_link_renamed(),section = 'link', knowledge = TRUE)
-  # })
 
-  # Re-name variables.
-  dat_link_renamed <<- eventReactive(input$Rename_Variables_LINK, {
-    rename_variables(dat_link(),section = 'link', knowledge = TRUE)
+  observeEvent(input$Rename_Variables_LINK, {
+    temp <- rename_variables(values$dat_link, section = 'link',knowledge = TRUE)
+    values$dat_link <- temp
   })
 
   Link_SAO_Analyzed <<- eventReactive(input$Analyze_Stuff_link_SAO, {
-    laq_analyze(dat_link_renamed(), skills = TRUE, knowledge = FALSE)
+    laq_analyze(values$dat_link, skills = TRUE, knowledge = FALSE)
   })
 
   Link_KNOW_Analyzed <<- eventReactive(input$Analyze_Stuff_link_KNOW, {
-    laq_analyze(dat_link_renamed(), skills = FALSE, knowledge = TRUE)
+    laq_analyze(values$dat_link, skills = FALSE, knowledge = TRUE)
   })
-
-  # Display Raw SPSS File Table.
-  output$table_link_renamed <-
-    DT::renderDataTable({
-      dat_link_renamed()
-    },
-    style = "bootstrap",
-    server = TRUE,
-    options = list(pageLength = 25,
-                   autoWidth = TRUE))
 
   # Display Raw SPSS File Table.
   output$pr_linkage_sao <-

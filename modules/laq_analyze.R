@@ -22,16 +22,21 @@ if (skills == TRUE & knowledge == FALSE) {
   Description_link_sao <<- datum %>%
     dplyr::select(paste0("SAAL_IMP_", 1:SAONumbersForLinkage)) %>%
     get_label() %>%
-    unname() %>%
-    substr(1, 20)
-  
+    unname()
+
+  # FLAG RESEARCH THIS FURTHER - BROKEN?
+  #if theres a -, –, or : plus a space within the first 30 characters, drop everything afte the colon. Otherwise, keep the first 20 characters.
+  Description_link_sao <<- ifelse(grepl("–\\s", substr(Description_link_sao,1,30)), gsub("(.*)–\\s.*","\\1",Description_link_sao),
+                 ifelse(grepl("-\\s", substr(Description_link_sao,1,30)), gsub("(.*)-\\s.*","\\1",Description_link_sao),
+                        ifelse(grepl(":\\s", substr(Description_link_sao,1,30)), gsub("(.*):\\s.*","\\1",Description_link_sao), substr(Description_link_sao,1,20))))     
+
   # Name the columns and rows.
   colnames(SAAL_Weighted_Matrix) <- c(as.character(DutyAreaLabel[1:length(Ratio_DAR)]),"Total","Z_Score","Standardized")
   rownames(SAAL_Weighted_Matrix) <- c(Description_link_sao, "Total")
 
   # Order results top-down.
   SAAL_Weighted_Matrix <- round(SAAL_Weighted_Matrix[with(SAAL_Weighted_Matrix,order(-SAAL_Total_Row_STD)),],digits = 2)
-  
+
   # #XLSX Output Stuff
   # SAAL_Raw_Weightings  <- createSheet(LAQ_Workbook, sheetName = "SAAL_Raw_Weightings")
   # SAAL_Calc_Weightings <- createSheet(LAQ_Workbook,sheetName = "SAAL_Weighted_Matrix")
@@ -70,11 +75,11 @@ if (skills == TRUE & knowledge == FALSE) {
         get_label() %>%
         unname() %>%
         substr(1, 35)
-    
+
     # Name the columns and rows.
     colnames(JDKL_Weighted_Matrix) <- c(as.character(DutyAreaLabel[1:length(Ratio_DAR)]),"Total","Z_Score","Standardized")
     rownames(JDKL_Weighted_Matrix) <- c(Description_link_know, "Total")
-
+    
     # Order results top-down.
     JDKL_Weighted_Matrix <- round(JDKL_Weighted_Matrix[with(JDKL_Weighted_Matrix,order(-JDKL_Total_Row_STD)),],digits = 2)
 

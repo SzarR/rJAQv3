@@ -1,29 +1,33 @@
 get_weightings <- function(datum){
-  
-  # First, exttract the duty area labels from
-  # the dat_task_renamed() file.
-  # 
-  # dutyarea_begin <- c("q0023_0001")
-  # dutyarea_end <- c("q0023_0011")
-  
+
   #FLAG Create Error code where the duty areas
   #DO not match to the linkage analysis.
-  
+
   First_DA_Location  <- which(colnames(datum) == dutyarea_begin)
   Last_DA_Location <- which(colnames(datum) == dutyarea_end)
   
   DutyAreaCount <<-  (Last_DA_Location - First_DA_Location + 1)
-  
+
   Number <- names(datum)[First_DA_Location:Last_DA_Location]
 
   Description <- datum %>% 
     select(Number) %>% 
     get_label() %>% 
     unname() 
-  
-  #remove number from beginning of label
+
+  # Remove number from beginning of label.
   Description <- gsub("^\\d+","",Description)
+  
+  # Remove period from beginning of label.
+  Description <- gsub("^\\.+","",Description)
+  
+  # Remove tab or space from beginning of label.
+  Description <- gsub("^\\t|^\\s","",Description)
+ 
+  # Name Re-Assignment.
   DutyAreaLabel <<- Description
+  
+  #FLAG Create duty area acronym here? Necessary?
   
   #create new df.
   Weighting.Frame <- cbind(1:DutyAreaCount, Description)
@@ -35,10 +39,10 @@ get_weightings <- function(datum){
 
   # Empty for later
   Start_DA <- rep("", DutyAreaCount)
-  
+
   Weighting.Frame <- cbind(Weighting.Frame, Weight_Percent, Start_DA, Start_DA)
   colnames(Weighting.Frame) <- c("Duty Area", "Label", "Weight", "Start", "End")
 
   return(Weighting.Frame)
-  
+
 }
