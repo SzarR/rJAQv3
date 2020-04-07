@@ -5,35 +5,7 @@ ui <-
     windowTitle = "rJAQv3",
     inverse = TRUE,
     theme = shinytheme("yeti"),
-
-    tabPanel(
-      tags$strong(h3("Job Analysis Initilization Panel")),
-      title = "Initilization",
-      sidebarLayout(
-        sidebarPanel(
-          "User Customizable Information",
-          br(),
-          br(),
-          textInput(
-            inputId = "ClientName",
-            label = "Client Name",
-            value = "Rochester, NY",
-            width = 425
-          ),
-          textInput(
-            inputId = "AnalysisRank",
-            label = "Rank",
-            value = "Firefighter/Driver",
-            width = 375
-          ),
-          br(),
-          br(),
-          "Quality Control Parameters"
-        ),
-        mainPanel(DT::dataTableOutput("X"))
-      )
-    ),
-
+    
     tabPanel(
       title = "Task Analysis",
       sidebarLayout(
@@ -259,6 +231,28 @@ ui <-
         ))
       ) #sidebar layout
 
-    ) #tab panel
+    ), #tab panel
 
+    tabPanel(title = "Save Results", 
+             "This chapter provides an interface for the user to download the results from
+             their job analysis that was run in the previous three chapters.",br(), br(), "If rJAQ detects the existence of an analysis, it will
+             automatically include that analysis in the downloaded XLSX file.",
+             br(),
+             textInput(
+               inputId = "AnalysisRank",
+               label = "Rank",
+               value = "",
+               width = 375
+             ),
+             textInput(
+               inputId = "ClientName",
+               label = "Client Name",
+               value = "",
+               width = 425
+             ),
+             selectInput(inputId = "ExporterFormat", label="Select File Format", choices = c("XLSX"), selected = "XLSX", width = 150),
+             downloadButton('downloadData', 'Download File', width = 125)
+    )
+    
+    
   ) #overall UI

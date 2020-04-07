@@ -22,6 +22,9 @@ jaq_analyze <- function(datum, section) {
     if ("IMP" %in% Scale_Choices & "FREQ" %in% Scale_Choices){
       get_composite(datum)
     }
+    
+    # Set row names.
+    row.names(Output.Frame.Task) <- c(1:TaskNumbers)
 
     return(Output.Frame.Task)
   }
@@ -50,6 +53,7 @@ jaq_analyze <- function(datum, section) {
       get_rvr(datum)
     }
 
+    row.names(Output.Frame.KSAO) <- c(1:KSAONumbers)
     return(Output.Frame.KSAO)
 
   }

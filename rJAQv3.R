@@ -9,7 +9,7 @@ library(haven)
 library(sjlabelled)
 library(tidyverse)
 library(stringr)
-#library(xlsx)
+library(xlsx) #For workbook exports.
 
 # Read in Folder of Custom Functions --------------------------------------
 for (i in list.files('./functions/')) {
@@ -22,4 +22,8 @@ for (i in list.files('./modules/')) {
   source(paste0('./modules/',i))
   rm(i)
 }
+
+# # Launch the app ----------------------------------------------------------
+# runApp(appDir = getwd(),
+#        launch.browser = TRUE)
 

@@ -4,9 +4,8 @@ if (skills == TRUE & knowledge == FALSE) {
 
   # Obtain column means.
   SAAL_ALI <- colMeans(datum[,LinkStatementNames_SAO], na.rm=TRUE)
-
-  # Create data matrix
-  SAAL_Matrix <- matrix(SAAL_ALI, nrow = SAONumbersForLinkage)
+  
+  SAAL_Matrix <<- matrix(SAAL_ALI, nrow = SAONumbersForLinkage)
 
   # Do multiplication on the created matrix
   SAAL_Weighted_Matrix    <- as.data.frame(sapply(1:ncol(SAAL_Matrix),function(x) Ratio_DAR[x] * SAAL_Matrix[,x]))
@@ -36,28 +35,24 @@ if (skills == TRUE & knowledge == FALSE) {
 
   # Order results top-down.
   SAAL_Weighted_Matrix <- round(SAAL_Weighted_Matrix[with(SAAL_Weighted_Matrix,order(-SAAL_Total_Row_STD)),],digits = 2)
-
-  # #XLSX Output Stuff
-  # SAAL_Raw_Weightings  <- createSheet(LAQ_Workbook, sheetName = "SAAL_Raw_Weightings")
-  # SAAL_Calc_Weightings <- createSheet(LAQ_Workbook,sheetName = "SAAL_Weighted_Matrix")
-  # #Row Styles for SAAL_Weighted_Matrix
-  # dfColIndex_SAAL_W           <- rep(list(ROWS_LAQ), dim(SAAL_Weighted_Matrix)[2]) 
-  # names(dfColIndex_SAAL_W)    <- seq(1, dim(SAAL_Weighted_Matrix)[2], by = 1)
-  # #Row Styles for SAAL_Matrix (Raw)
-  # dfColIndex_SAAL_R           <- rep(list(ROWS_LAQ), dim(SAAL_Matrix)[2]) 
-  # names(dfColIndex_SAAL_R)    <- seq(1, dim(SAAL_Matrix)[2], by = 1)
+  
+  # Create data matrix
+  SAAL_Matrix <<- matrix(SAAL_ALI, nrow = SAONumbersForLinkage)
+  SAAL_Matrix <<- round(SAAL_Matrix, digits = 2)
+  colnames(SAAL_Matrix)   <<- c(as.character(DutyAreaLabel[1:length(Ratio_DAR)]))
+  rownames(SAAL_Matrix)   <<- c(Description_link_sao)
 
   return(SAAL_Weighted_Matrix)
 
 }
 
   if (knowledge == TRUE & skills == FALSE){
- 
+
     # Obtain column means.
     JDKL_ALI <- colMeans(datum[,LinkStatementNames_KNOW], na.rm=TRUE)
 
     # Create data matrix
-    JDKL_Matrix <- matrix(JDKL_ALI, nrow = KnowNumbersForLinkage)
+    JDKL_Matrix <<- matrix(JDKL_ALI, nrow = KnowNumbersForLinkage)
 
     # Do multiplication on the created matrix
     JDKL_Weighted_Matrix    <- as.data.frame(sapply(1:ncol(JDKL_Matrix),function(x) Ratio_DAR[x] * JDKL_Matrix[,x]))
@@ -79,22 +74,17 @@ if (skills == TRUE & knowledge == FALSE) {
     # Name the columns and rows.
     colnames(JDKL_Weighted_Matrix) <- c(as.character(DutyAreaLabel[1:length(Ratio_DAR)]),"Total","Z_Score","Standardized")
     rownames(JDKL_Weighted_Matrix) <- c(Description_link_know, "Total")
-    
+
     # Order results top-down.
     JDKL_Weighted_Matrix <- round(JDKL_Weighted_Matrix[with(JDKL_Weighted_Matrix,order(-JDKL_Total_Row_STD)),],digits = 2)
 
-    # #XLSX Output Stuff
-    # SAAL_Raw_Weightings  <- createSheet(LAQ_Workbook, sheetName = "SAAL_Raw_Weightings")
-    # SAAL_Calc_Weightings <- createSheet(LAQ_Workbook,sheetName = "SAAL_Weighted_Matrix")
-    # #Row Styles for SAAL_Weighted_Matrix
-    # dfColIndex_SAAL_W           <- rep(list(ROWS_LAQ), dim(SAAL_Weighted_Matrix)[2]) 
-    # names(dfColIndex_SAAL_W)    <- seq(1, dim(SAAL_Weighted_Matrix)[2], by = 1)
-    # #Row Styles for SAAL_Matrix (Raw)
-    # dfColIndex_SAAL_R           <- rep(list(ROWS_LAQ), dim(SAAL_Matrix)[2]) 
-    # names(dfColIndex_SAAL_R)    <- seq(1, dim(SAAL_Matrix)[2], by = 1)
+    # Create data matrix
+    JDKL_Matrix <<- matrix(JDKL_ALI, nrow = KnowNumbersForLinkage)
+    JDKL_Matrix <<- round(JDKL_Matrix, digits = 2)
+    colnames(JDKL_Matrix)   <<- c(as.character(DutyAreaLabel[1:length(Ratio_DAR)]))
+    rownames(JDKL_Matrix)   <<- c(Description_link_know)
 
     return(JDKL_Weighted_Matrix)
 
   }
-
 }

@@ -36,6 +36,16 @@ server <- function(input, output, session) {
   observeEvent(input$rename_begin, {
     rename_begin <<- input$rename_begin
   })
+  
+  # Obtain start of rename column.
+  observeEvent(input$ClientName, {
+    ClientName <<- input$ClientName
+  })
+  
+  # Obtain start of rename column.
+  observeEvent(input$AnalysisRank, {
+    AnalysisRank <<- input$AnalysisRank
+  })
 
   # Obtain end of rename column.
   observeEvent(input$rename_end, {
@@ -76,7 +86,7 @@ server <- function(input, output, session) {
     QC1_Task <<- input$QC1_Task
   })
 
-  Tasks_Analyzed <- eventReactive(input$Analyze_Stuff, {
+  Tasks_Analyzed <<- eventReactive(input$Analyze_Stuff, {
 
     if(QC1_Task == TRUE){
       values$dat_task <- qualitycontrol_step1(datum = values$dat_task, section = 'task')
@@ -118,7 +128,7 @@ server <- function(input, output, session) {
   
   # Obtain end of rename column for knowledge.
   observeEvent(input$rename_end_know, {
-    rename_end_know<<- input$rename_end_know
+    rename_end_know <<- input$rename_end_know
   })
   
   # Obtain scales utilized.
@@ -194,7 +204,7 @@ server <- function(input, output, session) {
   })
   
   # Analysis of KSAO Statements ----------------------------------
-  KSAOs_Analyzed <- eventReactive(input$Analyze_Stuff_ksao, {
+  KSAOs_Analyzed <<- eventReactive(input$Analyze_Stuff_ksao, {
     
     # First check if QC1_KSAO active
     if(QC1_KSAO == TRUE){
@@ -218,7 +228,7 @@ server <- function(input, output, session) {
 # Duty Area Panel ---------------------------------------------------------
 
 # Get duty area weightings
-  DutyAreas <- eventReactive(input$Calculate_Weights, {
+  DutyAreas <<- eventReactive(input$Calculate_Weights, {
     get_weightings(values$dat_task)
   })
   
@@ -351,5 +361,22 @@ server <- function(input, output, session) {
     style = "bootstrap",
     server = TRUE,
     options = list(dom = 't'))
+  
+  # Data Download Parameters ------------------------------------------------
+  # Result from clicking the Download File.
+  output$downloadData <- downloadHandler(
+    filename = paste0(ClientName," ", AnalysisRank, '.xlsx'),
+    content = function(file) {
+      switch(
+        input$ExporterFormat,
+        XLSX = {
+          
+          export_workbook()
+          saveWorkbook(wb = Results_Workbook, file = file)
+          
+        }
+      )
+    }
+   )
 
 } # Server close.
