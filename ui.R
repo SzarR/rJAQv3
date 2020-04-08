@@ -1,3 +1,25 @@
+# Package requirements ----------------------------------------------------
+library(shiny)
+library(shinythemes)
+library(DT)
+library(haven)
+library(sjlabelled)
+library(tidyverse)
+library(stringr)
+library(xlsx) #For workbook exports.
+
+# Read in Folder of Custom Functions --------------------------------------
+for (i in list.files('./functions/')) {
+  source(paste0('./functions/',i))
+  rm(i)
+}
+
+# Read in Folder of Custom Modules --------------------------------------
+for (i in list.files('./modules/')) {
+  source(paste0('./modules/',i))
+  rm(i)
+}
+
 ui <-
   navbarPage(
     title = tags$strong("rJAQv3"),
@@ -35,6 +57,7 @@ ui <-
           column from the SPSS file. Caution, if the length exceeds 325 characters, the statement
           will be cut off. Results should be populated in the Task Statements tab to the right.",
           br(),
+          br(),
           actionButton(inputId = "Parse_Tasks",
                        label = "Extract Task Statements",
                        width = 225,),
@@ -66,7 +89,7 @@ ui <-
             inputId = 'QC1_Task',
             "This option converts to missing all data cases where a SME indicates NA but 
             continues to fill out the remaining scales. (QC1)",
-            value = FALSE,
+            value = TRUE,
             width = 400
           ),
           actionButton(
@@ -88,8 +111,9 @@ ui <-
       title = "KSAO Analysis",
       sidebarLayout(
         sidebarPanel(
-          "We now continue with the KSAO analysis. Please specify first the variables for the various
-          columns exactly as you did with the task analysis. This will help import the correct columns
+          "We now continue with the KSAO analysis. You must first specify the first scale of the first 
+          KSAO statement column name of the first KSAO along with the column name of the last scale of 
+          the last KSAO statement.
           for analysis.",
           h3("Specify Variable Limits"),
           "In the fields below, please indicate the first and last column name that correspond to 
@@ -102,16 +126,16 @@ ui <-
           splitLayout(
           textInput("rename_begin_know", label = "First scale, first knowledge statement",value = "", width = 160),
           textInput("rename_end_know", label = "Last scale, last knowledge statement", value = "", width = 160)),
-          h3("Parse Statement Labels"),
-          "The button below will automatically download the KSAO statements from your SPSS file. This will
-          populate the KSAO Statements tab on the right.",
           "Next, please upload a valid SPSS file below for the KSAO analysis. If your Task and KSAOs are
           in one SPSS file, simply re-upload that file again.",
           fileInput(inputId = "ksao", label = "", accept = ".sav",width = 475, 
                     placeholder = "Upload a valid SPSS file"),
+          h3("Parse Statement Labels"),
           "Click the button below to allow R to extract KSAO statements from the value label variable
           column from the SPSS file. Caution, if the length exceeds 325 characters, the statement
           will be cut off. Results should be populated in the KSAO Statements tab to the right.",
+          br(),
+          br(),
           actionButton(inputId = "Parse_KSAO",label = "Extract KSAO Statements", width = 225,
           ),
           h3("Specify Scales"),
@@ -140,12 +164,12 @@ ui <-
             inputId = 'QC1_KSAO',
             "This option converts to missing all data cases where a SME indicates NA but 
             continues to fill out the remaining scales. (QC1)",
-            value = FALSE,
+            value = TRUE,
             width = 400
           ),
           actionButton(
             inputId = "Analyze_Stuff_ksao",
-            label = "Analyze!",
+            label = "KSAO Analyze",
             width = 170
           )), 
         mainPanel(tabsetPanel(type = "tabs",
@@ -161,9 +185,12 @@ ui <-
       title = "Duty Areas",
       sidebarLayout(
         sidebarPanel(
-          "Please specify the first and last duty area column in your SPSS file.
-          This will extract the duty area labels in conjunction with the weights
-          to calculate the average DA weights.",
+          "Click the button below to extract the duty area weightings from the first
+          and last column that you specified in the task analysis file. The duty area
+          weightings must be present in the task analysis file, and the column names
+          can be inserted in that chapter of this app.",
+          br(),
+          br(),
           actionButton(
             inputId = "Calculate_Weights",
             label = "Get Weights",
@@ -172,8 +199,6 @@ ui <-
         mainPanel(tabsetPanel(type = "tabs",
                               tabPanel("Weightings",  DT::dataTableOutput("pr_dutyarea_weightings")),
                               tabPanel("Test Frame", DT::dataTableOutput("test_2"))
-                              #tabPanel("Renamed Data",  DT::dataTableOutput("renamed_ksao")),
-                              #tabPanel("KSAO Results", DT::dataTableOutput("pr_ksao_analysis"))
         ))
       ) #sidebar layout
 
@@ -201,8 +226,11 @@ ui <-
           is combined with your task/ksao analysis, simply upload the same file again.",
           fileInput(inputId = "link", label = "", accept = ".sav",width = 475,
                     placeholder = "Upload a valid SPSS file"),
-          "Next, we rename our columns for easier analysis. By clicking the button, the table on the right
-          should automatically update with the new column names.",
+          h3("Parse Statement Labels"),
+          "Click the button below to allow R to extract the SAOs/Knowledge areas from the Value Label variable
+          column from the SPSS file. Caution, if the length exceeds 325 characters, the statement
+          will be cut off. Results should be populated in the Statements tab to the right.",
+          br(),
           actionButton(
             inputId = "Rename_Variables_LINK",
             label = "Rename Variables",

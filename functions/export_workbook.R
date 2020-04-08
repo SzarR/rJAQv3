@@ -69,7 +69,7 @@ export_workbook <- function() {
   if (rename_begin_sao != "" |
       rename_begin_know != "") {
 
-    outs_2 <- KSAOs_Analyzed()
+    outs_2 <- KSAOs_Analyzed()[,-1]
 
     KSAO_Analysis <-
       xlsx::createSheet(wb = Results_Workbook, sheetName = "KSAO_Analysis")
@@ -89,7 +89,7 @@ export_workbook <- function() {
     )
     
     setColumnWidth(sheet = KSAO_Analysis,
-                   colIndex = 3,
+                   colIndex = 2,
                    colWidth = 90) # Change column width
     createFreezePane(sheet = KSAO_Analysis,
                      colSplit = 3,
@@ -97,16 +97,16 @@ export_workbook <- function() {
   }
 
 # Linkage SAO  ---------------------------------------------
-  
+
   if (rename_begin_link_sao != "") {
     outs_3 <- Link_SAO_Analyzed()
-    
+
     Weighted_SAO <-
       xlsx::createSheet(wb = Results_Workbook, sheetName = "Weighted_SAO")
-    
+
     dfColIndex           <- rep(list(ROWS), dim(outs_3)[2])
     names(dfColIndex)    <- seq(1, dim(outs_3)[2], by = 1)
-    
+
     addDataFrame(
       x = outs_3,
       sheet = Weighted_SAO,
@@ -117,7 +117,7 @@ export_workbook <- function() {
       colnamesStyle = TABLE_COLNAMES_STYLE,
       rownamesStyle = TABLE_ROWNAMES_STYLE
     )
-    
+
     setColumnWidth(sheet = Weighted_SAO,
                    colIndex = 1,
                    colWidth = 37)
@@ -127,7 +127,7 @@ export_workbook <- function() {
     
     dfColIndex           <- rep(list(ROWS), dim(SAAL_Matrix)[2])
     names(dfColIndex)    <- seq(1, dim(SAAL_Matrix)[2], by = 1)
-    
+
     addDataFrame(
       x = SAAL_Matrix,
       sheet = Raw_SAO,
@@ -140,18 +140,18 @@ export_workbook <- function() {
     )
       setColumnWidth(sheet = Raw_SAO, colIndex = 1, colWidth = 37)
   }
-  
+
   # Linkage Knowledge  ---------------------------------------------
-  
+
   if (rename_begin_link_know != "") {
     outs_4 <- Link_KNOW_Analyzed()
-    
+
     Weighted_KNOW <-
       xlsx::createSheet(wb = Results_Workbook, sheetName = "Weighted_KNOW")
-    
+
     dfColIndex           <- rep(list(ROWS), dim(outs_4)[2])
     names(dfColIndex)    <- seq(1, dim(outs_4)[2], by = 1)
-    
+
     addDataFrame(
       x = outs_4,
       sheet = Weighted_KNOW,
@@ -162,17 +162,17 @@ export_workbook <- function() {
       colnamesStyle = TABLE_COLNAMES_STYLE,
       rownamesStyle = TABLE_ROWNAMES_STYLE
     )
-    
+
     setColumnWidth(sheet = Weighted_KNOW,
                    colIndex = 1,
                    colWidth = 37) # Change column width
-    
+
     Raw_KNOW <-
       xlsx::createSheet(wb = Results_Workbook, sheetName = "Raw_KNOW")
-    
+
     dfColIndex           <- rep(list(ROWS), dim(JDKL_Matrix)[2])
     names(dfColIndex)    <- seq(1, dim(JDKL_Matrix)[2], by = 1)
-    
+
     addDataFrame(
       x = JDKL_Matrix,
       sheet = Raw_KNOW,
@@ -209,8 +209,7 @@ export_workbook <- function() {
     )
 
     setColumnWidth(sheet = DutyAreaz,
-                   colIndex = 1,
+                   colIndex = 3,
                    colWidth = 50) # Change column width
   }
-
 }

@@ -10,7 +10,7 @@ get_statements <- function(datum, section) {
   Number <- str_subset(colnames(datum),"q\\d\\d\\d\\d_\\d\\d\\d\\d_0001")
   
   Description <- datum %>% 
-    select(Number) %>% 
+    dplyr::select(Number) %>% 
     get_label() %>% 
     unname() 
 

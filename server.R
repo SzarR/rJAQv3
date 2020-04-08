@@ -169,6 +169,7 @@ server <- function(input, output, session) {
     # If only KNOW present, then this.  
     } else if (input$rename_begin_know != "" &
                input$rename_begin_sao == "") {
+      SAO_Analysis <- FALSE
       values$dat_ksao <- haven::read_sav(input$ksao$datapath) %>%
         dplyr::select(rename_begin_know:rename_end_know)
     }
@@ -199,7 +200,8 @@ server <- function(input, output, session) {
   # FLAG create an ifelse for Knowledge = TRUE based on whether
   # data in the knowledge fields of KSAO analysis chapter.
   observeEvent(input$Rename_Variables_KSAO, {
-    temp <- rename_variables(values$dat_ksao, section = 'ksao', knowledge = TRUE)
+    temp <- rename_variables(values$dat_ksao, section = 'ksao', 
+                             knowledge = ifelse(input$rename_begin_know != "", TRUE, FALSE))
     values$dat_ksao <- temp
   })
   
@@ -273,11 +275,6 @@ server <- function(input, output, session) {
 # Linkage Analysis Panel --------------------------------------------------
   
 # Upload link SPSS File -----------------------------------------------------
-  # 
-  # dat_link <- reactive({
-  #   if(is.null(input$link)) return(NULL)
-  #   haven::read_sav(input$link$datapath)
-  # })
 
   observeEvent(input$link, {
 
@@ -332,7 +329,7 @@ server <- function(input, output, session) {
   })
 
   observeEvent(input$Rename_Variables_LINK, {
-    temp <- rename_variables(values$dat_link, section = 'link',knowledge = TRUE)
+    temp <- rename_variables(values$dat_link, section = 'link',knowledge = ifelse(input$rename_begin_link_know != "", TRUE, FALSE))
     values$dat_link <- temp
   })
 
