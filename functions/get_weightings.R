@@ -35,7 +35,7 @@ get_weightings <- function(datum){
   # Calculate Average values.
   Corrected_DAR <- (colMeans(datum[,Number], na.rm=T))
   Ratio_DAR     <<- (round((Corrected_DAR / 100), digits = 2))
-  Weight_Percent <- paste0(Ratio_DAR, "%")
+  Weight_Percent <- paste0(Ratio_DAR*100, "%")
 
   # Empty for later
   Start_DA <- rep("", DutyAreaCount)

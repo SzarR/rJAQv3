@@ -1,25 +1,3 @@
-# Package requirements ----------------------------------------------------
-library(shiny)
-library(shinythemes)
-library(DT)
-library(haven)
-library(sjlabelled)
-library(tidyverse)
-library(stringr)
-library(xlsx) #For workbook exports.
-
-# Read in Folder of Custom Functions --------------------------------------
-for (i in list.files('./functions/')) {
-  source(paste0('./functions/',i))
-  rm(i)
-}
-
-# Read in Folder of Custom Modules --------------------------------------
-for (i in list.files('./modules/')) {
-  source(paste0('./modules/',i))
-  rm(i)
-}
-
 ui <-
   navbarPage(
     title = tags$strong("rJAQv3"),
@@ -52,16 +30,6 @@ ui <-
           download from the Survey Monkey website.",
           fileInput(inputId = "task", label = "", accept = ".sav",width = 475, 
                     placeholder = "Upload a valid SPSS file"),
-          h3("Parse Statement Labels"),
-          "Click the button below to allow R to extract statements from the Value Label variable
-          column from the SPSS file. Caution, if the length exceeds 325 characters, the statement
-          will be cut off. Results should be populated in the Task Statements tab to the right.",
-          br(),
-          br(),
-          actionButton(inputId = "Parse_Tasks",
-                       label = "Extract Task Statements",
-                       width = 225,),
-          br(),
           h3("Specify Scales"),
           "In the drop-down below, indicate which scale(s) have been  utilized for the JAQ. Select ALL
           that apply.",
@@ -71,12 +39,12 @@ ui <-
             'Scale_Choices',
             label = NULL,
             choices = c(
-              "APP",
-              "IMP",
-              "FREQ",
-              "REQU"
+              "NA_",
+              "IMP_",
+              "FREQ_",
+              "REQU_"
             ),
-            selected = NULL,
+            selected = 0,
             width = 340,
             options = list(create = TRUE, maxItems = 4)
           ),
@@ -99,7 +67,7 @@ ui <-
           )), 
         mainPanel(tabsetPanel(type = "tabs",
                               tabPanel("Data",  DT::dataTableOutput("pr_table_task")),
-                              tabPanel("Task Statements", DT::dataTableOutput("pr_statements_task")),
+                              #tabPanel("Task Statements", DT::dataTableOutput("pr_statements_task")),
                               #tabPanel("Renamed Data",  DT::dataTableOutput("pr_renamed_tasks")),
                               tabPanel("Task Results", DT::dataTableOutput("pr_task_analysis"))
                               ))
@@ -130,14 +98,6 @@ ui <-
           in one SPSS file, simply re-upload that file again.",
           fileInput(inputId = "ksao", label = "", accept = ".sav",width = 475, 
                     placeholder = "Upload a valid SPSS file"),
-          h3("Parse Statement Labels"),
-          "Click the button below to allow R to extract KSAO statements from the value label variable
-          column from the SPSS file. Caution, if the length exceeds 325 characters, the statement
-          will be cut off. Results should be populated in the KSAO Statements tab to the right.",
-          br(),
-          br(),
-          actionButton(inputId = "Parse_KSAO",label = "Extract KSAO Statements", width = 225,
-          ),
           h3("Specify Scales"),
           "In the table below, please indicate which scales have been  utilized for the KSAO analysis. 
           Select all that apply.",
@@ -145,13 +105,13 @@ ui <-
             'Scale_Choices_ksao',
             label = NULL,
             choices = c(
-              "APP",
-              "IMP",
-              "REQU",
-              "DIFF",
-              "RvR"
+              "NA_",
+              "IMP_",
+              "REQU_",
+              "DIFF_",
+              "RvR_"
             ),
-            selected = NULL,
+            selected = 0,
             width = 340,
             options = list(create = TRUE, maxItems = 5)
           ),
@@ -174,13 +134,12 @@ ui <-
           )), 
         mainPanel(tabsetPanel(type = "tabs",
                               tabPanel("Data",  DT::dataTableOutput("pr_table_ksao")),
-                              tabPanel("KSAO Statements", DT::dataTableOutput("pr_statements_ksao")),
+                              #tabPanel("KSAO Statements", DT::dataTableOutput("pr_statements_ksao")),
                               tabPanel("KSAO Results", DT::dataTableOutput("pr_ksao_analysis"))
         ))
       ) #sidebar layout
-      
-    ), #tab panel
 
+    ), #tab panel
     tabPanel(
       title = "Duty Areas",
       sidebarLayout(
@@ -260,27 +219,30 @@ ui <-
       ) #sidebar layout
 
     ), #tab panel
+               tabPanel(
+                 "Demographics",
+                 sidebarLayout(
+                   sidebarPanel(
+                     width = 3,
+                     selectInput(inputId = 'Which_Demographic_File',
+                                 label = "Pull Variables From:",
+                                 choices = c("Task Analysis", "KSAO Analysis", "Linkage Analysis"),
+                                 selected = 0,
+                                 width = 200),
+                     uiOutput('dynamic_ui'),
+                     actionButton('goButton', 'Add to Table', icon('cloud-upload'))
+                   ),
+                   mainPanel(id = 'dataset02', dataTableOutput('table3'))
+                   )
+), 
 
     tabPanel(title = "Save Results", 
              "This chapter provides an interface for the user to download the results from
              their job analysis that was run in the previous three chapters.",br(), br(), "If rJAQ detects the existence of an analysis, it will
              automatically include that analysis in the downloaded XLSX file.",
              br(),
-             textInput(
-               inputId = "AnalysisRank",
-               label = "Rank",
-               value = "",
-               width = 375
-             ),
-             textInput(
-               inputId = "ClientName",
-               label = "Client Name",
-               value = "",
-               width = 425
-             ),
              selectInput(inputId = "ExporterFormat", label="Select File Format", choices = c("XLSX"), selected = "XLSX", width = 150),
              downloadButton('downloadData', 'Download File', width = 125)
     )
-    
-    
+
   ) #overall UI

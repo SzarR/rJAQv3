@@ -1,4 +1,4 @@
-rename_variables <- function(datum, section, knowledge=FALSE){
+rename_variables <- function(datum, section){
   
   # Written by RWS
   # This function takes a user settable first variable name
@@ -17,35 +17,11 @@ rename_variables <- function(datum, section, knowledge=FALSE){
   # consistent. Not sure how to accomplish this just yet.
 
   if (section == 'task') {
+
+    First_Location <- which(colnames(datum) == rename_begin)
+    Last_Location <- which(colnames(datum) == rename_end)
     
-    # Create renaming scales.
-    TaskStatementNames <- NULL
-    
-    if ("APP" %in% Scale_Choices) {
-      TaskStatementNames <- c("NA_")
-    }
-    
-    if ("IMP" %in% Scale_Choices) {
-      TaskStatementNames <- c(TaskStatementNames, "IMP_")
-    }
-    
-    if ("FREQ" %in% Scale_Choices) {
-      TaskStatementNames <- c(TaskStatementNames, "FREQ_")
-    }
-    
-    if ("REQU" %in% Scale_Choices) {
-      TaskStatementNames <- c(TaskStatementNames, "REQU_")
-    }
-    
-    if ("DIFF" %in% Scale_Choices) {
-      TaskStatementNames <- c(TaskStatementNames, "DIFF_")
-    }
-    
-    # FLAG: If not found, throw an error!
-    #####################################
-    
-    First_Location <- which(colnames(datum) == rename_begin) #
-    Last_Location <- which(colnames(datum) == rename_end) #rename_end
+    TaskNumbers <<- ((Last_Location - First_Location + 1) / length(Scale_Choices))
     
     #Checker to ensure variables all match up mathematically.
     # ifelse((Last_Task_Location - First_Task_Location + 1) / length(TaskStatementNames) == TaskNumbers,
@@ -53,51 +29,39 @@ rename_variables <- function(datum, section, knowledge=FALSE){
     #        warning("Re-Check task information")
     
     #Run the renaming.
-    NewVariable_Names <- as.vector(outer(TaskStatementNames, 1:TaskNumbers, paste0))
-    colnames(datum)[First_Location:Last_Location] <- NewVariable_Names
-    
+    NewVariable_Names_Task <<- as.vector(outer(Scale_Choices, 1:TaskNumbers, paste0))
+    colnames(datum)[First_Location:Last_Location] <- NewVariable_Names_Task
   }
   
   if(section == 'ksao'){
     
-    KSAOStatementNames <- NULL
+    KSAONumbers <<- NULL
+    KSAOStatementNames <- Scale_Choices_ksao
     
-    if("APP" %in% Scale_Choices_ksao){
-      KSAOStatementNames <- c("NA_")
+    if("RvR_" %in% Scale_Choices_ksao){
+      KSAOStatementNames <- KSAOStatementNames[!KSAOStatementNames %in% 'RvR_']
     }
-    
-    if("IMP" %in% Scale_Choices_ksao){
-      KSAOStatementNames <- c(KSAOStatementNames, "IMP_")
-    }
-    
-    if("REQU" %in% Scale_Choices_ksao){
-      KSAOStatementNames <- c(KSAOStatementNames, "REQU_")
-    }
-    
-    if("DIFF" %in% Scale_Choices_ksao){
-      KSAOStatementNames <- c(KSAOStatementNames, "DIFF_")
-    }
-    
+
     First_Location  <- which(colnames(datum) == rename_begin_sao)
     Last_Location   <- which(colnames(datum) == rename_end_sao)
-    
+
     SAONumbers <<- (Last_Location - First_Location + 1) / length(KSAOStatementNames)
-    
+    KSAONumbers <<- SAONumbers
+
     #Run the renaming.
     NewVariable_Names <- as.vector(outer(KSAOStatementNames,1:SAONumbers, paste0))
     colnames(datum)[First_Location:Last_Location] <- NewVariable_Names
 
-    if(knowledge==TRUE){
-
-      if("RvR" %in% Scale_Choices_ksao){
-        KSAOStatementNames <- c(KSAOStatementNames, "RvR_")
-      }
+    if("RvR_" %in% Scale_Choices_ksao){
+ 
+      KSAOStatementNames <- c(KSAOStatementNames, "RvR_")
 
       #Knowledge Renamer
       First_Know_Location  <- which(colnames(datum) == rename_begin_know)
       Last_Know_Location <- which(colnames(datum) == rename_end_know)
 
       KnowNumbers <<- (Last_Know_Location - First_Know_Location + 1) / length(KSAOStatementNames)
+      KSAONumbers <<- KnowNumbers + SAONumbers
 
       Know_NewVariable_Names <<- as.vector(outer(KSAOStatementNames, (SAONumbers+1):(SAONumbers + KnowNumbers),paste0))
       colnames(datum)[First_Know_Location:Last_Know_Location] <- Know_NewVariable_Names
@@ -105,7 +69,7 @@ rename_variables <- function(datum, section, knowledge=FALSE){
   }
 
   if(section == 'link'){
-    
+
     # FLAG. How about Knowledge Yes but SAO No?
 
     First_LinkSAO_Location <<- which(colnames(datum) == rename_begin_link_sao) 

@@ -7,13 +7,26 @@ get_statements <- function(datum, section) {
   # generated as they were in rJAQv2. 
   # Detect columns with q_####_####_0001 format. This pulls the first scale for the variable.
   
-  Number <- str_subset(colnames(datum),"q\\d\\d\\d\\d_\\d\\d\\d\\d_0001")
+  #Number <- str_subset(colnames(datum),"q\\d\\d\\d\\d_\\d\\d\\d\\d_0001")
+  
+  if(section == 'task'){
+  TaskTemp <- paste0("NA_", 1:TaskNumbers)
   
   Description <- datum %>% 
-    dplyr::select(Number) %>% 
+    dplyr::select(TaskTemp) %>% 
     get_label() %>% 
     unname() 
-
+  }
+  
+  if (section == 'ksao') {
+    KSAOTemp <- paste0("IMP_", 1:KSAONumbers)
+    
+    Description <- datum %>% 
+      dplyr::select(KSAOTemp) %>% 
+      get_label() %>% 
+      unname() 
+  }
+  
   #remove number from beginning of label
   Description <- gsub("^\\d+","",Description)
 
@@ -27,15 +40,11 @@ get_statements <- function(datum, section) {
   #create new df.
   Description.Frame <<- data.frame(Number,Description)
 
-  #Obtain numbers
-  if (section == 'task') {
-    TaskNumbers <<- nrow(Description.Frame)
-  }
-
-  if (section == 'ksao') {
-    KSAONumbers <<- nrow(Description.Frame)
-  }
-
+  # #Obtain numbers
+  # if (section == 'task') {
+  #   TaskNumbers <<- nrow(Description.Frame)
+  # }
+  
   return(Description.Frame)
 
 }

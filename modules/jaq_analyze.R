@@ -3,23 +3,23 @@ jaq_analyze <- function(datum, section) {
   if(section == 'task'){
     Output.Frame.Task <<- data.frame(Description.Frame)
 
-    if ("APP" %in% Scale_Choices) {
+    if ("NA_" %in% Scale_Choices) {
       get_applicability(datum, section = 'task')
     }
 
-    if ("IMP" %in% Scale_Choices) {
+    if ("IMP_" %in% Scale_Choices) {
       get_importance(datum, section = 'task')
     }
 
-    if ("FREQ" %in% Scale_Choices) {
+    if ("FREQ_" %in% Scale_Choices) {
       get_frequency(datum)
     }
 
-    if ("REQU" %in% Scale_Choices) {
+    if ("REQU_" %in% Scale_Choices) {
       get_required(datum, section = 'task')
     }
 
-    if ("IMP" %in% Scale_Choices & "FREQ" %in% Scale_Choices){
+    if ("IMP_" %in% Scale_Choices & "FREQ_" %in% Scale_Choices){
       get_composite(datum)
     }
     
@@ -33,24 +33,28 @@ jaq_analyze <- function(datum, section) {
 
     Output.Frame.KSAO <<- data.frame(Description.Frame)
 
-    if ("APP" %in% Scale_Choices_ksao) {
+    if ("NA_" %in% Scale_Choices_ksao) {
       get_applicability(datum, section = 'ksao')
     }
 
-    if ("IMP" %in% Scale_Choices_ksao) {
+    if ("IMP_" %in% Scale_Choices_ksao) {
       get_importance(datum, section = 'ksao')
     }
 
-    if ("REQU" %in% Scale_Choices_ksao) {
+    if ("REQU_" %in% Scale_Choices_ksao) {
       get_required(datum, section = 'ksao')
     }
 
-    if ("DIFF" %in% Scale_Choices_ksao) {
+    if ("DIFF_" %in% Scale_Choices_ksao) {
       get_differentiation(datum)
     }
 
-    if ("RvR" %in% Scale_Choices_ksao) {
+    if ("RvR_" %in% Scale_Choices_ksao) {
       get_rvr(datum)
+    }
+    
+    if ("IMP_" %in% Scale_Choices_ksao & "NA_" %in% Scale_Choices_ksao){
+      get_composite(datum, ksao = TRUE)
     }
 
     row.names(Output.Frame.KSAO) <- c(1:KSAONumbers)

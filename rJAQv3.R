@@ -10,6 +10,7 @@ library(sjlabelled)
 library(tidyverse)
 library(stringr)
 library(xlsx) #For workbook exports.
+library(summarytools)
 
 # Read in Folder of Custom Functions --------------------------------------
 for (i in list.files('./functions/')) {

@@ -10,7 +10,7 @@ export_workbook <- function() {
       position = c("TOP", "BOTTOM", "LEFT", "RIGHT"),
       pen = c("BORDER_THIN")
     )
-  
+
   TABLE_COLNAMES_STYLE <-
     CellStyle(Results_Workbook) + Fill(foregroundColor = "dodgerblue4") + Font(Results_Workbook,
                                                                            isBold = TRUE,
@@ -22,7 +22,7 @@ export_workbook <- function() {
       pen =
         c("BORDER_THIN", "BORDER_THICK", "BORDER_THIN", "BORDER_THIN")
     )
-  
+
   ROWS <-
     CellStyle(Results_Workbook) + Font(wb = Results_Workbook,
                                    name = "Calibri",
@@ -34,15 +34,15 @@ export_workbook <- function() {
       position = c("TOP", "LEFT", "RIGHT", "BOTTOM"),
       pen = c("BORDER_THIN")
     )
-  
+
 # Task Analysis Export Piece ----------------------------------------------
-  
+
   if(!is.null(Tasks_Analyzed())){
     outs_1 <- Tasks_Analyzed()[,-1]
-    
+
     Task_Analysis <-
       xlsx::createSheet(wb = Results_Workbook, sheetName = "Task_Analysis")
-    
+
     dfColIndex           <- rep(list(ROWS), dim(outs_1)[2])
     names(dfColIndex)    <- seq(1, dim(outs_1)[2], by = 1)
     
@@ -66,23 +66,24 @@ export_workbook <- function() {
   
 # KSAO Analysis Output ----------------------------------------------------
   
-  if (rename_begin_sao != "" |
-      rename_begin_know != "") {
+  # if (rename_begin_sao != "" |
+  #     rename_begin_know != "") {
+  if(!is.null(KSAOs_Analyzed())){
 
-    outs_2 <- KSAOs_Analyzed()[,-1]
+    outs_2 <<- KSAOs_Analyzed()[,-1]
 
     KSAO_Analysis <-
       xlsx::createSheet(wb = Results_Workbook, sheetName = "KSAO_Analysis")
-
-    dfColIndex           <- rep(list(ROWS), dim(outs_2)[2])
-    names(dfColIndex)    <- seq(1, dim(outs_2)[2], by = 1)
+# 
+#     dfColIndex           <- rep(list(ROWS), dim(outs_2)[2])
+#     names(dfColIndex)    <- seq(1, dim(outs_2)[2], by = 1)
 
     addDataFrame(
       x = outs_2,
       sheet = KSAO_Analysis,
       startRow = 1,
       startColumn = 1,
-      colStyle = dfColIndex,
+      #colStyle = dfColIndex,
       showNA = FALSE,
       colnamesStyle = TABLE_COLNAMES_STYLE,
       rownamesStyle = TABLE_ROWNAMES_STYLE
@@ -212,4 +213,34 @@ export_workbook <- function() {
                    colIndex = 3,
                    colWidth = 50) # Change column width
   }
+  
+# Demographics ------------------------------------------------------------
+
+if (nrow(demo_task_df) > 0) {
+  
+  if(Which_Demographic_File == 'Task Analysis'){
+  xyz <<- get_demographics(datum=values$dat_task)
+  } else if(Which_Demographic_File == 'KSAO Analysis') {
+    xyz <<- get_demographics(datum=values$dat_ksao)
+  } else if(Which_Demographic_File == 'Linkage Analysis'){
+    xyz <<- get_demographics(datum=values$dat_link)
+  }
+
+  Demoz <-
+    xlsx::createSheet(wb = Results_Workbook, sheetName = "Demographics")
+  
+  for (row in 1:nrow(demo_task_df)) {
+    addDataFrame(
+      x = xyz[[row]],
+      sheet = Demoz,
+      startRow = row * 12,
+      startColumn = 2,
+      showNA = FALSE,
+      colnamesStyle = TABLE_COLNAMES_STYLE,
+      rownamesStyle = TABLE_ROWNAMES_STYLE
+    )
+  }
+
+}
+
 }

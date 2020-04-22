@@ -1,5 +1,6 @@
-get_composite <- function(datum){
+get_composite <- function(datum, ksao = FALSE){
 
+  if(ksao == FALSE){
   # Create a composite data frame.
   Composite_Frame <- (datum[,paste0("IMP_",Description.Frame$Number)] * 2 + datum[,paste0("FREQ_",Description.Frame$Number)])/3
   names(Composite_Frame) <- paste0("C_", Description.Frame$Number)
@@ -25,7 +26,7 @@ get_composite <- function(datum){
   ESS_SD <- round(sapply(Essentiality_Frame, sd, 2), digits = 2)
 
   Output.Frame.Task <<- cbind(Output.Frame.Task, COMP, COMP_SD, ESS, ESS_SD)
-  
+
   ZONE <- ifelse(APP >= 66.67 & ESS >= 66.67, 1.1,
                 ifelse((APP >= 66.67 & ESS >= 50.00 & ESS < 66.67), 1.2,
                 ifelse((APP >= 50.00 & APP < 66.67 & ESS >= 66.67), 1.3,
@@ -43,6 +44,23 @@ get_composite <- function(datum){
                 ifelse((APP >= 0 & APP < 33.33 & ESS >= 33.33 & ESS < 50.00), 4.3,
                 ifelse((APP >= 0 & APP < 33.33 & ESS >= 0 & ESS < 33.33), 4.4, NA
                 )))))))))))))))) #BOOM Matrix created by Bob. 
-    
+  
     Output.Frame.Task <<- cbind(Output.Frame.Task, ZONE)
+  }
+  
+    if(ksao == TRUE){
+      
+      # Make this a seperate function that is user-editable?
+      IMP_Cutter <- if(Max_IMP == 5) {
+        IMP_Cutter <- 3
+      } else if(Max_IMP == 4) {
+        IMP_Cutter <- 2.5
+      } else if(Max_IMP == 3) {
+        IMP_Cutter <- 1.5
+      }
+  
+      Essentiality <- ifelse(Output.Frame.KSAO$APP >= 66.67 & Output.Frame.KSAO$IMP >= IMP_Cutter,1,0)
+
+      Output.Frame.KSAO <<- cbind(Output.Frame.KSAO, Essentiality)
+    }
 }
