@@ -9,8 +9,9 @@ library(haven)
 library(sjlabelled)
 library(tidyverse)
 library(stringr)
-library(xlsx) #For workbook exports.
+library(xlsx) # For workbook exports.
 library(summarytools)
+library(shinyalert) # For pretty modals.
 
 # Read in Folder of Custom Functions --------------------------------------
 for (i in list.files('./functions/')) {

@@ -66,9 +66,9 @@ export_workbook <- function() {
   
 # KSAO Analysis Output ----------------------------------------------------
   
-  # if (rename_begin_sao != "" |
-  #     rename_begin_know != "") {
-  if(!is.null(KSAOs_Analyzed())){
+   if (rename_begin_sao != "" |
+       rename_begin_know != "") {
+  #if(!is.null(KSAOs_Analyzed())){
 
     outs_2 <<- KSAOs_Analyzed()[,-1]
 
@@ -242,5 +242,5 @@ if (nrow(demo_task_df) > 0) {
   }
 
 }
-
+#return(Results_Workbook) # yes?
 }

@@ -12,7 +12,7 @@ get_composite <- function(datum, ksao = FALSE){
   } else if (Max_IMP == 5 & Max_FREQ == 5) {
     Essentiality_Frame <-
       as.data.frame(ifelse(Composite_Frame[1:length(Composite_Frame)] >= 3.00, 1, 0))
-  } else {
+  } else { #FLAG! Dangerous?
     Essentiality_Frame <-
       as.data.frame(ifelse(Composite_Frame[1:length(Composite_Frame)] >= 2.66, 1, 0))
   }

@@ -1,11 +1,11 @@
 get_weightings <- function(datum){
 
-  #FLAG Create Error code where the duty areas
-  #DO not match to the linkage analysis.
+  if(dutyarea_end %in% colnames(datum)){
 
   First_DA_Location  <- which(colnames(datum) == dutyarea_begin)
   Last_DA_Location <- which(colnames(datum) == dutyarea_end)
   
+  # This line of code drives linkage shinyalert feature.
   DutyAreaCount <<-  (Last_DA_Location - First_DA_Location + 1)
 
   Number <- names(datum)[First_DA_Location:Last_DA_Location]
@@ -44,5 +44,13 @@ get_weightings <- function(datum){
   colnames(Weighting.Frame) <- c("Duty Area", "Label", "Weight", "Start", "End")
 
   return(Weighting.Frame)
+  
+  } else {
+    
+    make_alert(title = "Error!", 
+               text = "Cannot find the duty area column limits in the specified file.",
+               type = 'error')
+    
+  }
 
 }

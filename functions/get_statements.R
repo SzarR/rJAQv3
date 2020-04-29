@@ -19,14 +19,21 @@ get_statements <- function(datum, section) {
   }
   
   if (section == 'ksao') {
-    KSAOTemp <- paste0("IMP_", 1:KSAONumbers)
     
+    if(Checker_1 == TRUE & Checker_2 == TRUE) {
+      Temp_Subset <- paste0("IMP_", 1:KSAONumbers)
+    } else if (Checker_1 == TRUE & Checker_2 == FALSE) {
+      Temp_Subset <- paste0("IMP_", 1:SAONumbers)
+    } else if (Checker_2 == TRUE & Checker_1 == FALSE) {
+      Temp_Subset <- paste0("IMP_", 1:KnowNumbers)
+    }
+
     Description <- datum %>% 
-      dplyr::select(KSAOTemp) %>% 
+      dplyr::select(Temp_Subset) %>% 
       get_label() %>% 
       unname() 
   }
-  
+
   #remove number from beginning of label
   Description <- gsub("^\\d+","",Description)
 
@@ -39,12 +46,5 @@ get_statements <- function(datum, section) {
 
   #create new df.
   Description.Frame <<- data.frame(Number,Description)
-
-  # #Obtain numbers
-  # if (section == 'task') {
-  #   TaskNumbers <<- nrow(Description.Frame)
-  # }
-  
-  return(Description.Frame)
 
 }

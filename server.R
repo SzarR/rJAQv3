@@ -3,11 +3,10 @@ server <- function(input, output, session) {
 # Task Analysis Panel -----------------------------------------------------
 # Upload Task SPSS File -----------------------------------------------------
   values <<- reactiveValues(dat_task = NULL)
-
+  
   observeEvent(input$task, {
-
     values$dat_task <- haven::read_sav(input$task$datapath)
-
+    
   })
 
   # Display Raw SPSS File Table.
@@ -17,7 +16,8 @@ server <- function(input, output, session) {
     },
     style = "bootstrap",
     server = TRUE,
-    options = list(pageLength = 25,
+    options = list(searching = FALSE,
+                   paging = FALSE,
                    autoWidth = TRUE))
 
 # Renaming SPSS File Variable Names ---------------------------------------
@@ -46,18 +46,25 @@ server <- function(input, output, session) {
   observeEvent(input$Scale_Choices, {
     Scale_Choices <<- input$Scale_Choices
   })
-  
+
   # Obtain scales utilized.
   observeEvent(input$Which_Demographic_File, {
     Which_Demographic_File <<- input$Which_Demographic_File
   })
 
   observeEvent(input$Rename_Variables, {
+
+    make_alert(title="Please confirm your variable ordering matches the below list.",
+               text = paste(Scale_Choices, collapse = " "),
+               type = 'info')
+
     temp <- rename_variables(values$dat_task, section = 'task')
     values$dat_task <- temp
     
-    # After renaming complete, extract task statement labels.
+    if(exists("TaskNumbers") == TRUE){
     get_statements(values$dat_task, section = 'task')
+    }
+    
   })
 
 # Analysis of Task JAQ Statements ----------------------------------
@@ -84,7 +91,8 @@ server <- function(input, output, session) {
     extensions = c("Buttons"),
     rownames = FALSE,
     options = list(dom = 'Bfrtip',
-                   pageLength = 250,
+                   searching = FALSE,
+                   paging = FALSE,
                    autoWidth = TRUE,
                    buttons = c('copy', 'csv', 'excel', 'pdf', 'print')
                    ),
@@ -121,39 +129,7 @@ server <- function(input, output, session) {
   })
 
   observeEvent(input$ksao, {
-    
-    # FLAG Does not work :(
-    # Validate function.
-    #req(input$rename_begin_sao, input$rename_begin_know)
-
-    # FLAG! Update this for task analysis chapter upload too.
-    # Must specify the column names before uploading the file here!
-    # To accurately parse out the KSAO statements from the task 
-    # statements. Should we back-apply to this to the task upload
-    # as well?
-    
     values$dat_ksao <- haven::read_sav(input$ksao$datapath)
-    
-    # # If Knowledge + SAO Present in SAO Analysis, then this.
-    # if (input$rename_begin_sao != "" &
-    #     input$rename_begin_know != "") {
-    #   values$dat_ksao <- haven::read_sav(input$ksao$datapath) %>%
-    #     dplyr::select(rename_begin_sao:rename_end_sao,
-    #                   rename_begin_know:rename_end_know)
-    # 
-    # # If only SAO Present, then this.
-    # } else if (input$rename_begin_sao != "" &
-    #            input$rename_begin_know == "") {
-    #   values$dat_ksao <- haven::read_sav(input$ksao$datapath) %>%
-    #     dplyr::select(rename_begin_sao:rename_end_sao)
-    # 
-    # # If only KNOW present, then this.  
-    # } else if (input$rename_begin_know != "" &
-    #            input$rename_begin_sao == "") {
-    #   SAO_Analysis <- FALSE
-    #   values$dat_ksao <- haven::read_sav(input$ksao$datapath) %>%
-    #     dplyr::select(rename_begin_know:rename_end_know)
-    # }
   })
   
   # Display KSAO Table
@@ -163,19 +139,26 @@ server <- function(input, output, session) {
     },
     style = "bootstrap",
     server = TRUE,
-    options = list(pageLength = 25,
+    options = list(searching = FALSE,
+                   paging = FALSE,
                    autoWidth = TRUE))
 
   observeEvent(input$Rename_Variables_KSAO, {
+
+    make_alert(title="Please confirm your variable ordering matches the below list.",
+               text = paste(Scale_Choices_ksao, collapse = " "),
+               type = 'info')
+
     temp <- rename_variables(values$dat_ksao, section = 'ksao')
     values$dat_ksao <- temp
-    
-    # Extract KSAO labels
+
     get_statements(values$dat_ksao,section = 'ksao')
+
   })
-  
+
   # Analysis of KSAO Statements ----------------------------------
   KSAOs_Analyzed <<- eventReactive(input$Analyze_Stuff_ksao, {
+    shiny::req(Description.Frame, values$dat_ksao)
     
     # First check if QC1_KSAO active
     if(QC1_KSAO == TRUE){
@@ -195,7 +178,8 @@ server <- function(input, output, session) {
     extensions = c("Buttons"),
     rownames = FALSE,
     options = list(dom = 'Bfrtip',
-                   pageLength = 250,
+                   searching = FALSE,
+                   paging = FALSE,
                    autoWidth = TRUE,
                    buttons = c('copy', 'csv', 'excel', 'pdf', 'print')
     ),
@@ -205,9 +189,15 @@ server <- function(input, output, session) {
   
 # Get duty area weightings
   DutyAreas <<- eventReactive(input$Calculate_Weights, {
-    get_weightings(values$dat_task)
+
+    if (input$Where_DA == 'Task Analysis File') {
+      get_weightings(values$dat_task)
+    } else {
+      get_weightings(values$dat_ksao)
+    }
+
   })
-  
+
   # Obtain start of rename column for duty areas
   observeEvent(input$dutyarea_begin, {
     dutyarea_begin <<- input$dutyarea_begin
@@ -231,21 +221,7 @@ server <- function(input, output, session) {
                  rownames = FALSE,
                  autoWidth = FALSE,
                  escape = FALSE))
-  
-  output$test_2 <- DT::renderDataTable({
-    DutyAreas()
-  },
-  style = "bootstrap",
-  editable = 'cell',
-  server = FALSE,
-  options = list(pageLength = 25,
-                 searching = FALSE,
-                 paging = FALSE,
-                 ordering = FALSE,
-                 rownames = FALSE,
-                 autoWidth = FALSE,
-                 escape = FALSE))
-  
+
 # Demographics Data Download -----------------------------------------------------------
   demo_task_df <<- data.frame(Demographic_Name=character(0), Column_Name=character(0), Analysis_Type=integer(0))
   
@@ -299,18 +275,16 @@ server <- function(input, output, session) {
       ~{
         output <- data.frame(input[[.y]])
         colnames(output) <- .x
-        
+
         return(output)
       }
     )
-    
+
     demo_task_df <<- rbind(demo_task_df, new_data)
     demo_task_df
-    
+
   }, ignoreNULL = FALSE) 
-  
-  
-  
+
 # Linkage Analysis Panel --------------------------------------------------
 
 # Upload link SPSS File -----------------------------------------------------
@@ -366,11 +340,14 @@ server <- function(input, output, session) {
   observeEvent(input$rename_end_link_know, {
     rename_end_link_know <<- input$rename_end_link_know
   })
+  
+  # Custom name your xlsx output file.
+  observeEvent(input$file_namer, {
+    file_namer <<- input$file_namer
+  })
 
   observeEvent(input$Rename_Variables_LINK, {
-    temp <- rename_variables(values$dat_link, section = 'link',
-                             knowledge = ifelse(input$rename_begin_link_know != "", 
-                                                TRUE, FALSE))
+    temp <- rename_variables(values$dat_link, section = 'link')
     values$dat_link <- temp
   })
 
@@ -403,14 +380,13 @@ server <- function(input, output, session) {
   # Data Download Parameters ------------------------------------------------
   # Result from clicking the Download File.
   output$downloadData <- downloadHandler(
-    filename = 'JAQ_Workbook.xlsx',
+    filename = paste0(file_namer, '.xlsx'),
     content = function(file) {
       switch(
         input$ExporterFormat,
         XLSX = {
           export_workbook()
           saveWorkbook(wb = Results_Workbook, file = file)
-
         }
       )
     }

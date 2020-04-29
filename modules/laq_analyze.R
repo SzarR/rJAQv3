@@ -1,7 +1,15 @@
 laq_analyze <- function(datum, skills=FALSE, knowledge=FALSE) {
-
+  
 if (skills == TRUE & knowledge == FALSE) {
-
+  
+  if(rename_begin_link_sao == "" | rename_end_link_sao == "") {
+    
+    make_alert(title = "Error!", 
+               text = "You did not specify column limits for skill/ability areas above!",
+               type = 'error')
+    
+  } else {
+  
   # Obtain column means.
   SAAL_ALI <- colMeans(datum[,LinkStatementNames_SAO], na.rm=TRUE)
   
@@ -43,10 +51,18 @@ if (skills == TRUE & knowledge == FALSE) {
   rownames(SAAL_Matrix)   <<- c(Description_link_sao)
 
   return(SAAL_Weighted_Matrix)
-
+}
 }
 
   if (knowledge == TRUE & skills == FALSE){
+    
+    if(rename_begin_link_know == "" | rename_end_link_know == "") {
+      
+      make_alert(title = "Error!", 
+                 text = "You did not specify column limits for knowledge areas above!",
+                 type = 'error')
+      
+    } else {
 
     # Obtain column means.
     JDKL_ALI <- colMeans(datum[,LinkStatementNames_KNOW], na.rm=TRUE)
@@ -85,6 +101,6 @@ if (skills == TRUE & knowledge == FALSE) {
     rownames(JDKL_Matrix)   <<- c(Description_link_know)
 
     return(JDKL_Weighted_Matrix)
-
+    }
   }
 }

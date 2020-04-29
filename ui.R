@@ -1,5 +1,6 @@
 ui <-
   navbarPage(
+    useShinyalert(),
     title = tags$strong("rJAQv3"),
     selected = "Task Analysis",
     windowTitle = "rJAQv3",
@@ -20,12 +21,6 @@ ui <-
           splitLayout(
           textInput("rename_begin", label = "First scale, first task statement column name", value = "", width = 160),
           textInput("rename_end", label = "Last scale, last task statement column name", value = "", width = 160)),
-          "If you captured duty area weightings, please specify the first and last column of the duty area
-          weightings. If not applicable, leave these fields blank.",
-          splitLayout(
-            textInput("dutyarea_begin", label = "First duty area column name",value = "", width = 160),
-            textInput("dutyarea_end", label = "Last duty area column name", value = "", width = 160)
-          ),
           "Next, please upload the task, or task/ksao analysis file. The file should be a direct 
           download from the Survey Monkey website.",
           fileInput(inputId = "task", label = "", accept = ".sav",width = 475, 
@@ -44,7 +39,6 @@ ui <-
               "FREQ_",
               "REQU_"
             ),
-            selected = 0,
             width = 340,
             options = list(create = TRUE, maxItems = 4)
           ),
@@ -67,8 +61,6 @@ ui <-
           )), 
         mainPanel(tabsetPanel(type = "tabs",
                               tabPanel("Data",  DT::dataTableOutput("pr_table_task")),
-                              #tabPanel("Task Statements", DT::dataTableOutput("pr_statements_task")),
-                              #tabPanel("Renamed Data",  DT::dataTableOutput("pr_renamed_tasks")),
                               tabPanel("Task Results", DT::dataTableOutput("pr_task_analysis"))
                               ))
         ) #sidebar layout
@@ -111,7 +103,6 @@ ui <-
               "DIFF_",
               "RvR_"
             ),
-            selected = 0,
             width = 340,
             options = list(create = TRUE, maxItems = 5)
           ),
@@ -134,7 +125,6 @@ ui <-
           )), 
         mainPanel(tabsetPanel(type = "tabs",
                               tabPanel("Data",  DT::dataTableOutput("pr_table_ksao")),
-                              #tabPanel("KSAO Statements", DT::dataTableOutput("pr_statements_ksao")),
                               tabPanel("KSAO Results", DT::dataTableOutput("pr_ksao_analysis"))
         ))
       ) #sidebar layout
@@ -144,6 +134,18 @@ ui <-
       title = "Duty Areas",
       sidebarLayout(
         sidebarPanel(
+          "Please specify the column limits for duty areas next.",
+          splitLayout(
+            textInput("dutyarea_begin", label = "First duty area column name",value = "", width = 160),
+            textInput("dutyarea_end", label = "Last duty area column name", value = "", width = 160)
+          ),
+          "Now, specify if these columns are in the task or KSAO analysis SPSS file that
+          you uploaded in the previous chapter.",
+          selectInput(inputId = 'Where_DA',
+                      label = "",
+                      choices = c("Task Analysis File", "KSAO Analysis File"),
+                      selected = 0,
+                      width = 200),
           "Click the button below to extract the duty area weightings from the first
           and last column that you specified in the task analysis file. The duty area
           weightings must be present in the task analysis file, and the column names
@@ -156,8 +158,7 @@ ui <-
             width = 145
           )), 
         mainPanel(tabsetPanel(type = "tabs",
-                              tabPanel("Weightings",  DT::dataTableOutput("pr_dutyarea_weightings")),
-                              tabPanel("Test Frame", DT::dataTableOutput("test_2"))
+                              tabPanel("Weightings",  DT::dataTableOutput("pr_dutyarea_weightings"))
         ))
       ) #sidebar layout
 
@@ -207,7 +208,6 @@ ui <-
           ),
           actionButton(
             inputId = "Analyze_Stuff_link_KNOW",
-            #style=('padding:4px; font-size:80%'),
             label = "Run Knowledge Areas Analysis",
             width = 240
             ))),
@@ -240,6 +240,9 @@ ui <-
              "This chapter provides an interface for the user to download the results from
              their job analysis that was run in the previous three chapters.",br(), br(), "If rJAQ detects the existence of an analysis, it will
              automatically include that analysis in the downloaded XLSX file.",
+             "Below, specify what you would like the xlsx file to be named. If you leave this blank, 
+             rJAQ will default to naming your file JAQ_Workbook.",
+             textInput("file_namer", label = "Name your file", value = "JAQ_Workbook", width = 380),
              br(),
              selectInput(inputId = "ExporterFormat", label="Select File Format", choices = c("XLSX"), selected = "XLSX", width = 150),
              downloadButton('downloadData', 'Download File', width = 125)
