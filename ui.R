@@ -4,6 +4,7 @@ ui <-
     title = tags$strong("rJAQv3"),
     selected = "Task Analysis",
     windowTitle = "rJAQv3",
+    id = 'navbar',
     inverse = TRUE,
     theme = shinytheme("yeti"),
     
@@ -134,7 +135,7 @@ ui <-
       title = "Duty Areas",
       sidebarLayout(
         sidebarPanel(
-          "Please specify the column limits for duty areas next.",
+          "Please specify the column limits for duty areas.",
           splitLayout(
             textInput("dutyarea_begin", label = "First duty area column name",value = "", width = 160),
             textInput("dutyarea_end", label = "Last duty area column name", value = "", width = 160)
@@ -146,15 +147,15 @@ ui <-
                       choices = c("Task Analysis File", "KSAO Analysis File"),
                       selected = 0,
                       width = 200),
-          "Finally, specify, as a string, the task statements that delineate one
-          duty area from another. For example, if task 25 is the last statement
-          of Duty Area 1, and 26 is the first statement of Duty Area 2, you would
-          include in the box: 1, 26, etc.",
-          textAreaInput("DA_Limits", label = h3("Duty Area Limits"), placeholder = "1, XX, etc.",width = 300),
-          "Click the button below to extract the duty area weightings from the first
-          and last column that you specified in the task analysis file. The duty area
-          weightings must be present in the task analysis file, and the column names
-          can be inserted in that chapter of this app.",
+          "Finally, specify the last task statement number for each duty area
+          in your JAQ. For example, if task 25 is the last statement
+          in duty area 1, and 54 is the last statement of duty area 2, you would
+          include in the box: 26, 54, etc. There should be a total of numbers
+          equivalent to the number of duty areas in your JAQ. All numbers must
+          be seperated with a comma.",
+          textAreaInput("DA_Limits", label = h3("Duty Area Limits"), placeholder = "26, 54, etc.",width = 300),
+          "Click the button below to extract the duty area weightings and set
+          limits on the duty area start/stop locations.",
           br(),
           br(),
           actionButton(
@@ -246,14 +247,23 @@ ui <-
 
     tabPanel(title = "Save Results", 
              "This chapter provides an interface for the user to download the results from
-             their job analysis that was run in the previous three chapters.",br(), br(), "If rJAQ detects the existence of an analysis, it will
-             automatically include that analysis in the downloaded XLSX file.",
-             "Below, specify what you would like the xlsx file to be named. If you leave this blank, 
-             rJAQ will default to naming your file JAQ_Workbook.",
-             textInput("file_namer", label = "Name your file", value = "JAQ_Workbook", width = 380),
+             their job analysis that was run in the previous four chapters.",
+             br(), 
              br(),
-             selectInput(inputId = "ExporterFormat", label="Select File Format", choices = c("XLSX"), selected = "XLSX", width = 150),
-             downloadButton('downloadData', 'Download File', width = 125)
-)
+             "If rJAQ detects the existence of an analysis, it will
+             automatically include that analysis in the downloaded XLSX file.",
+             br(),
+             selectInput(inputId = "ExporterFormat", 
+                         label="Select File Format", 
+                         choices = c("XLSX"), 
+                         selected = "XLSX", 
+                         width = 150),
+             downloadButton('downloadData', 
+                            'Download File', 
+                            width = 125)
+),
+    tabPanel(title = "Quit", 
+             value="stop", 
+             icon = icon("circle-o-notch"))
 
   ) #overall UI

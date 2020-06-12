@@ -12,7 +12,7 @@ export_workbook <- function() {
     )
 
   TABLE_COLNAMES_STYLE <-
-    CellStyle(Results_Workbook) + Fill(foregroundColor = "dodgerblue4") + Font(Results_Workbook,
+    CellStyle(Results_Workbook) + Fill(foregroundColor = "black",backgroundColor = 'white') + Font(Results_Workbook,
                                                                            isBold = TRUE,
                                                                            name = "Calibri",
                                                                            color = "azure") +
@@ -39,6 +39,9 @@ export_workbook <- function() {
 
   if(!is.null(Tasks_Analyzed())){
     outs_1 <- Tasks_Analyzed()[,-1]
+    
+    # Append Duty area Labels
+    outs_1 <- cbind(outs_1, DutyAreaLabel)
 
     Task_Analysis <-
       xlsx::createSheet(wb = Results_Workbook, sheetName = "Task_Analysis")
@@ -55,10 +58,15 @@ export_workbook <- function() {
       showNA = FALSE,
       colnamesStyle = TABLE_COLNAMES_STYLE,
       rownamesStyle = TABLE_ROWNAMES_STYLE)
-    
+
     setColumnWidth(sheet = Task_Analysis,
                    colIndex = 2,
                    colWidth = 90) # Change column width
+
+    setColumnWidth(sheet = Task_Analysis,
+                   colIndex = 16,
+                   colWidth = 60) # Change column width
+    
     createFreezePane(sheet = Task_Analysis,
                      colSplit = 3,
                      rowSplit = 2) # Freeze Panes
@@ -229,7 +237,7 @@ if (nrow(demo_task_df) > 0) {
   Demoz <-
     xlsx::createSheet(wb = Results_Workbook, sheetName = "Demographics")
   
-  for (row in 1:nrow(demo_task_df)) {
+  for (row in 1:length(xyz)) {
     addDataFrame(
       x = xyz[[row]],
       sheet = Demoz,

@@ -21,9 +21,8 @@ get_weightings <- function(datum){
     unname()
 
   # Remove number from label beginning.
-  DutyAreaLabels <<- trimws(gsub("^\\d+|\\.|\\t|^\\s|-|,|;|:","",DutyAreaLabels))
+  DutyAreaLabels <- trimws(gsub("^\\d+|\\.|\\t|^\\s|-|,|;|:","",DutyAreaLabels))
   
-
   # Calculate Average values.
   Corrected_DAR <- (colMeans(datum[,DutyAreaVars], na.rm=T))
   Ratio_DAR <<- (round((Corrected_DAR / 100), digits = 2))
@@ -33,12 +32,15 @@ get_weightings <- function(datum){
                             'Label' = DutyAreaLabels,
                             'Weight' = Weight_Percent,
                             'Begin' = da_df[['Begin']],
-                            'End' = da_df[['End']])
-    
-  #   
-  #   cbind(1:DutyAreaCount, DutyAreaLabels, Weight_Percent, da_df$Begin, da_df$End, da_df$Count)
-  # colnames(Weighting.Frame) <- c("Duty Area", "Label", "Weight", "Begin", "End")
-  # 
+                            'End' = da_df[['End']],
+                            'Count' = da_df[['Count']])
+  
+  DutyAreaLabel <<- rep(Weighting.Frame$Label, 
+                    Weighting.Frame$Count)
+  
+  # Make global for reference in LAQ analysis
+  DutyAreaLabels <<- DutyAreaLabels
+
   return(Weighting.Frame)
   
   } else {
@@ -46,5 +48,4 @@ get_weightings <- function(datum){
                text = "Cannot locate columns in specified file.",
                type = 'error')
   }
-  
 }

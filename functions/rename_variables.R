@@ -13,13 +13,16 @@ rename_variables <- function(datum, section){
     First_Location <- which(colnames(datum) == rename_begin)
     Last_Location <- which(colnames(datum) == rename_end)
 
-    if(((Last_Location - First_Location + 1) %% length(Scale_Choices)) != 0) {
+    sum1 <- (Last_Location - First_Location + 1)
+    sum2 <- length(Scale_Choices)
+    
+    if(sum1 %% sum2 != 0) {
   
       make_alert(title = "Error!", 
                  text = "Either your column variable limits or scale choices are incorrect!",
                  type = 'error')
-
-    } else {
+      
+    } else if(sum1 %% sum2 == 0) {
     
     TaskNumbers <<- ((Last_Location - First_Location + 1) / length(Scale_Choices))
 

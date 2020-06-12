@@ -54,12 +54,12 @@ server <- function(input, output, session) {
 
   observeEvent(input$Rename_Variables, {
 
-    make_alert(title="Please confirm your variable ordering matches the below list.",
-               text = paste(Scale_Choices, collapse = " "),
-               type = 'info')
+    message("The scale order for task analysis was as follows: ", 
+            Scale_Choices)
 
     temp <- rename_variables(values$dat_task, section = 'task')
     values$dat_task <- temp
+    rm(temp)
     
     if(exists("TaskNumbers") == TRUE){
     get_statements(values$dat_task, section = 'task')
@@ -148,10 +148,6 @@ server <- function(input, output, session) {
     ))
   
   observeEvent(input$Rename_Variables_KSAO, {
-
-    make_alert(title="Please confirm your variable ordering matches the below list.",
-               text = paste(Scale_Choices_ksao, collapse = " "),
-               type = 'info')
 
     temp <- rename_variables(values$dat_ksao, section = 'ksao')
     values$dat_ksao <- temp
@@ -357,11 +353,6 @@ server <- function(input, output, session) {
   observeEvent(input$rename_end_link_know, {
     rename_end_link_know <<- input$rename_end_link_know
   })
-  
-  # Custom name your xlsx output file.
-  observeEvent(input$file_namer, {
-    file_namer <<- input$file_namer
-  })
 
   observeEvent(input$Rename_Variables_LINK, {
     temp <- rename_variables(values$dat_link, section = 'link')
@@ -427,7 +418,7 @@ server <- function(input, output, session) {
   # Data Download Parameters ------------------------------------------------
   # Result from clicking the Download File.
   output$downloadData <- downloadHandler(
-    filename = paste0(file_namer, '.xlsx'),
+    filename = "JAQ_Workbook.xlsx",
     content = function(file) {
       switch(
         input$ExporterFormat,
@@ -438,5 +429,12 @@ server <- function(input, output, session) {
       )
     }
    )
+
+# Quit Button -------------------------------------------------------------
+
+  observe({
+    if (input$navbar == "stop")
+      stopApp()
+  })
 
 } # Server close.

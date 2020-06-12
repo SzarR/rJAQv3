@@ -12,12 +12,13 @@ get_statements <- function(datum, section) {
   if(section == 'task'){
   TaskTemp <- paste0("NA_", 1:TaskNumbers)
   
-  Description <- datum %>% 
+  Description <- 
+    datum %>% 
     dplyr::select(TaskTemp) %>% 
     get_label() %>% 
     unname() 
   }
-  
+
   if (section == 'ksao') {
     
     if(Checker_1 == TRUE & Checker_2 == TRUE) {
