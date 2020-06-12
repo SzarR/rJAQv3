@@ -79,7 +79,7 @@ server <- function(input, output, session) {
     }
     jaq_analyze(values$dat_task, section = 'task')
   })
-
+  
   # Display task analysis results.
   output$pr_task_analysis <-
     DT::renderDataTable({
@@ -90,13 +90,13 @@ server <- function(input, output, session) {
     server = TRUE,
     extensions = c("Buttons"),
     rownames = FALSE,
-    options = list(dom = 'Bfrtip',
-                   searching = FALSE,
-                   paging = FALSE,
-                   autoWidth = TRUE,
-                   buttons = c('copy', 'csv', 'excel', 'pdf', 'print')
-                   ),
-    class = 'display')
+    options = list(
+      dom = 'Bfrtip',
+      searching = FALSE,
+      paging = FALSE,
+      autoWidth = TRUE,
+      buttons = c('copy', 'csv', 'excel', 'pdf', 'print')
+    ))
   
 # KSAO Analysis Panel ---------------------------------------------
   observeEvent(input$QC1_KSAO, {
@@ -139,10 +139,14 @@ server <- function(input, output, session) {
     },
     style = "bootstrap",
     server = TRUE,
-    options = list(searching = FALSE,
-                   paging = FALSE,
-                   autoWidth = TRUE))
-
+    options = list(
+      dom = 'Bfrtip',
+      searching = FALSE,
+      paging = FALSE,
+      autoWidth = TRUE,
+      buttons = c('copy', 'csv', 'excel', 'pdf', 'print')
+    ))
+  
   observeEvent(input$Rename_Variables_KSAO, {
 
     make_alert(title="Please confirm your variable ordering matches the below list.",
@@ -187,15 +191,23 @@ server <- function(input, output, session) {
 
 # Duty Area Panel ---------------------------------------------------------
   
+  # Obtain duty area limits
+  observeEvent(input$DA_Limits, {
+    DA_Limits <<- as.numeric(unlist(strsplit(input$DA_Limits,",")))
+  })
+  
 # Get duty area weightings
   DutyAreas <<- eventReactive(input$Calculate_Weights, {
+    
+    # Splice DA Limits for Later Inclusion in Table
+    da_df <<- get_da_limits(DA_Limits)
 
     if (input$Where_DA == 'Task Analysis File') {
       get_weightings(values$dat_task)
     } else {
       get_weightings(values$dat_ksao)
     }
-
+    
   })
 
   # Obtain start of rename column for duty areas
@@ -212,18 +224,23 @@ server <- function(input, output, session) {
     DutyAreas()
   },
   style = "bootstrap",
-  editable = 'cell',
   server = FALSE,
-  options = list(pageLength = 25,
-                 searching = FALSE,
-                 paging = FALSE,
-                 ordering = FALSE,
-                 rownames = FALSE,
-                 autoWidth = FALSE,
-                 escape = FALSE))
+  options = list(
+    dom = 'Bfrtip',
+    pageLength = 25,
+    searching = FALSE,
+    paging = FALSE,
+    ordering = FALSE,
+    rownames = FALSE,
+    autoWidth = FALSE,
+    escape = FALSE,
+    buttons = c('copy', 'csv', 'excel', 'pdf', 'print')
+  ))
 
 # Demographics Data Download -----------------------------------------------------------
-  demo_task_df <<- data.frame(Demographic_Name=character(0), Column_Name=character(0), Analysis_Type=integer(0))
+  demo_task_df <<- data.frame(Demographic_Name=character(0),
+                              Column_Name=character(0),
+                              Analysis_Type=integer(0))
   
   output$table3 <- renderDataTable( df3(),
                                     options = list(pageLength = 25,
@@ -311,7 +328,7 @@ server <- function(input, output, session) {
     }
   })
   
-  # Display Raw SPSS File Table.
+  # Display Raw SPSS File.
   output$pr_table_link <-
     DT::renderDataTable({
       values$dat_link
@@ -358,25 +375,55 @@ server <- function(input, output, session) {
   Link_KNOW_Analyzed <<- eventReactive(input$Analyze_Stuff_link_KNOW, {
     laq_analyze(values$dat_link, skills = FALSE, knowledge = TRUE)
   })
+  
+  # Render Raw SAAL Table.
+  output$pr_linkage_raw_sao <-
+    DT::renderDataTable({
+      SAAL_Matrix
+    },
+    style = "bootstrap",
+    server = TRUE,
+    options = list(
+      dom = 'Bfrtip',
+      buttons = c('copy', 'csv', 'excel', 'pdf', 'print')
+    ))
 
-  # Display Raw SPSS File Table.
+  # Render Weighted SAAL Table.
   output$pr_linkage_sao <-
     DT::renderDataTable({
       Link_SAO_Analyzed()
     },
     style = "bootstrap",
     server = TRUE,
-    options = list(dom = 't'))
-
-  # Display Raw SPSS File Table.
+    options = list(
+      dom = 'Bfrtip',
+      buttons = c('copy', 'csv', 'excel', 'pdf', 'print')
+    ))
+  
+  # Render Raw JDKL Table.
+  output$pr_linkage_raw_sao <-
+    DT::renderDataTable({
+      JDKL_Matrix
+    },
+    style = "bootstrap",
+    server = TRUE,
+    options = list(
+      dom = 'Bfrtip',
+      buttons = c('copy', 'csv', 'excel', 'pdf', 'print')
+    ))
+  
+  # Render Weighted JDKL Table.
   output$pr_linkage_know <-
     DT::renderDataTable({
       Link_KNOW_Analyzed()
     },
     style = "bootstrap",
     server = TRUE,
-    options = list(dom = 't'))
-
+    options = list(
+      dom = 'Bfrtip',
+      buttons = c('copy', 'csv', 'excel', 'pdf', 'print')
+    ))
+  
   # Data Download Parameters ------------------------------------------------
   # Result from clicking the Download File.
   output$downloadData <- downloadHandler(

@@ -1,56 +1,50 @@
 get_weightings <- function(datum){
+  
+  req(DA_Limits)
 
   if(dutyarea_end %in% colnames(datum)){
 
-  First_DA_Location  <- which(colnames(datum) == dutyarea_begin)
-  Last_DA_Location <- which(colnames(datum) == dutyarea_end)
+  # Vector of duty area names
+  DutyAreaVars <-
+    datum %>%
+    select(dutyarea_begin:dutyarea_end) %>%
+    names()
   
-  # This line of code drives linkage shinyalert feature.
-  DutyAreaCount <<-  (Last_DA_Location - First_DA_Location + 1)
+  # Count of duty areas
+  DutyAreaCount <<-  length(DutyAreaVars)
 
-  Number <- names(datum)[First_DA_Location:Last_DA_Location]
-
-  Description <- datum %>% 
-    select(Number) %>% 
+  # Duty Area Labels/Names
+  DutyAreaLabels <- 
+    datum %>% 
+    select(DutyAreaVars) %>% 
     get_label() %>% 
-    unname() 
+    unname()
 
-  # Remove number from beginning of label.
-  Description <- gsub("^\\d+","",Description)
+  # Remove number from label beginning.
+  DutyAreaLabels <<- trimws(gsub("^\\d+|\\.|\\t|^\\s|-|,|;|:","",DutyAreaLabels))
   
-  # Remove period from beginning of label.
-  Description <- gsub("^\\.+","",Description)
-  
-  # Remove tab or space from beginning of label.
-  Description <- gsub("^\\t|^\\s","",Description)
- 
-  # Name Re-Assignment.
-  DutyAreaLabel <<- Description
-  
-  #FLAG Create duty area acronym here? Necessary?
-  
-  #create new df.
-  Weighting.Frame <- cbind(1:DutyAreaCount, Description)
 
   # Calculate Average values.
-  Corrected_DAR <- (colMeans(datum[,Number], na.rm=T))
-  Ratio_DAR     <<- (round((Corrected_DAR / 100), digits = 2))
-  Weight_Percent <- paste0(Ratio_DAR*100, "%")
+  Corrected_DAR <- (colMeans(datum[,DutyAreaVars], na.rm=T))
+  Ratio_DAR <<- (round((Corrected_DAR / 100), digits = 2))
+  Weight_Percent <- paste0(Ratio_DAR * 100, "%")
 
-  # Empty for later
-  Start_DA <- rep("", DutyAreaCount)
-
-  Weighting.Frame <- cbind(Weighting.Frame, Weight_Percent, Start_DA, Start_DA)
-  colnames(Weighting.Frame) <- c("Duty Area", "Label", "Weight", "Start", "End")
-
+  Weighting.Frame <- tibble(`Duty Area` = 1:DutyAreaCount,
+                            'Label' = DutyAreaLabels,
+                            'Weight' = Weight_Percent,
+                            'Begin' = da_df[['Begin']],
+                            'End' = da_df[['End']])
+    
+  #   
+  #   cbind(1:DutyAreaCount, DutyAreaLabels, Weight_Percent, da_df$Begin, da_df$End, da_df$Count)
+  # colnames(Weighting.Frame) <- c("Duty Area", "Label", "Weight", "Begin", "End")
+  # 
   return(Weighting.Frame)
   
   } else {
-    
-    make_alert(title = "Error!", 
-               text = "Cannot find the duty area column limits in the specified file.",
+    make_alert(title = "Error!",
+               text = "Cannot locate columns in specified file.",
                type = 'error')
-    
   }
-
+  
 }

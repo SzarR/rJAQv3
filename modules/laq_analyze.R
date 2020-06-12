@@ -38,7 +38,7 @@ if (skills == TRUE & knowledge == FALSE) {
                         ifelse(grepl(":\\s", substr(Description_link_sao,1,30)), gsub("(.*):\\s.*","\\1",Description_link_sao), substr(Description_link_sao,1,20))))     
 
   # Name the columns and rows.
-  colnames(SAAL_Weighted_Matrix) <- c(as.character(DutyAreaLabel[1:length(Ratio_DAR)]),"Total","Z_Score","Standardized")
+  colnames(SAAL_Weighted_Matrix) <- c(as.character(DutyAreaLabels[1:length(Ratio_DAR)]),"Total","Z_Score","Standardized")
   rownames(SAAL_Weighted_Matrix) <- c(Description_link_sao, "Total")
 
   # Order results top-down.
@@ -47,7 +47,7 @@ if (skills == TRUE & knowledge == FALSE) {
   # Create data matrix
   SAAL_Matrix <<- matrix(SAAL_ALI, nrow = SAONumbersForLinkage)
   SAAL_Matrix <<- round(SAAL_Matrix, digits = 2)
-  colnames(SAAL_Matrix)   <<- c(as.character(DutyAreaLabel[1:length(Ratio_DAR)]))
+  colnames(SAAL_Matrix)   <<- c(as.character(DutyAreaLabels[1:length(Ratio_DAR)]))
   rownames(SAAL_Matrix)   <<- c(Description_link_sao)
 
   return(SAAL_Weighted_Matrix)
@@ -88,7 +88,7 @@ if (skills == TRUE & knowledge == FALSE) {
         substr(1, 35)
 
     # Name the columns and rows.
-    colnames(JDKL_Weighted_Matrix) <- c(as.character(DutyAreaLabel[1:length(Ratio_DAR)]),"Total","Z_Score","Standardized")
+    colnames(JDKL_Weighted_Matrix) <- c(as.character(DutyAreaLabels[1:length(Ratio_DAR)]),"Total","Z_Score","Standardized")
     rownames(JDKL_Weighted_Matrix) <- c(Description_link_know, "Total")
 
     # Order results top-down.
@@ -97,7 +97,7 @@ if (skills == TRUE & knowledge == FALSE) {
     # Create data matrix
     JDKL_Matrix <<- matrix(JDKL_ALI, nrow = KnowNumbersForLinkage)
     JDKL_Matrix <<- round(JDKL_Matrix, digits = 2)
-    colnames(JDKL_Matrix)   <<- c(as.character(DutyAreaLabel[1:length(Ratio_DAR)]))
+    colnames(JDKL_Matrix)   <<- c(as.character(DutyAreaLabels[1:length(Ratio_DAR)]))
     rownames(JDKL_Matrix)   <<- c(Description_link_know)
 
     return(JDKL_Weighted_Matrix)

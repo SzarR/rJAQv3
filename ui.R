@@ -146,6 +146,11 @@ ui <-
                       choices = c("Task Analysis File", "KSAO Analysis File"),
                       selected = 0,
                       width = 200),
+          "Finally, specify, as a string, the task statements that delineate one
+          duty area from another. For example, if task 25 is the last statement
+          of Duty Area 1, and 26 is the first statement of Duty Area 2, you would
+          include in the box: 1, 26, etc.",
+          textAreaInput("DA_Limits", label = h3("Duty Area Limits"), placeholder = "1, XX, etc.",width = 300),
           "Click the button below to extract the duty area weightings from the first
           and last column that you specified in the task analysis file. The duty area
           weightings must be present in the task analysis file, and the column names
@@ -157,8 +162,9 @@ ui <-
             label = "Get Weights",
             width = 145
           )), 
-        mainPanel(tabsetPanel(type = "tabs",
-                              tabPanel("Weightings",  DT::dataTableOutput("pr_dutyarea_weightings"))
+         mainPanel(tabsetPanel(type = "tabs",
+                               tabPanel("Weightings",
+                                        DT::dataTableOutput("pr_dutyarea_weightings"))
         ))
       ) #sidebar layout
 
@@ -213,8 +219,10 @@ ui <-
             ))),
         mainPanel(tabsetPanel(type = "tabs",
                               tabPanel("Data",  DT::dataTableOutput("pr_table_link")),
-                              tabPanel("Skil/Abil Matrix", DT::dataTableOutput("pr_linkage_sao")),
-                              tabPanel("Knowledge Matrix", DT::dataTableOutput("pr_linkage_know"))
+                              tabPanel("SAAL_Raw", DT::dataTableOutput("pr_linkage_raw_sao")),
+                              tabPanel("SAAL_Weighted", DT::dataTableOutput("pr_linkage_sao")),
+                              tabPanel("JDKL_Raw", DT::dataTableOutput("pr_xr_sao")),
+                              tabPanel("JDKL_Weighted", DT::dataTableOutput("pr_linkage_know"))
         ))
       ) #sidebar layout
 
@@ -246,6 +254,6 @@ ui <-
              br(),
              selectInput(inputId = "ExporterFormat", label="Select File Format", choices = c("XLSX"), selected = "XLSX", width = 150),
              downloadButton('downloadData', 'Download File', width = 125)
-    )
+)
 
   ) #overall UI
