@@ -6,7 +6,11 @@ get_da_limits <- function(DA_Limits) {
   # task data XLSX output file.
 
   if (!is.numeric(DA_Limits)) {
-    stop("You cannot include letters in your string!")
+    stop("You cannot include letters in your specification.")
+  }
+  
+  if (all(diff(DA_Limits) >= 0) == FALSE) {
+    stop("Your duty area limits must be in ascending numerical value.")
   }
 
   x <- tibble(
@@ -17,7 +21,7 @@ get_da_limits <- function(DA_Limits) {
 
   x <-
     x %>%
-    mutate(Count = (End - Begin)+1)
+    mutate(Count = (End - Begin) + 1)
 
   return(x)
 }

@@ -1,12 +1,11 @@
 server <- function(input, output, session) {
 
 # Task Analysis Panel -----------------------------------------------------
-# Upload Task SPSS File -----------------------------------------------------
+  
   values <<- reactiveValues(dat_task = NULL)
   
   observeEvent(input$task, {
     values$dat_task <- haven::read_sav(input$task$datapath)
-    
   })
 
   # Display Raw SPSS File Table.
@@ -67,7 +66,8 @@ server <- function(input, output, session) {
     
   })
 
-# Analysis of Task JAQ Statements ----------------------------------
+# Analysis of Task JAQ Statements ---------------------------------
+  
   observeEvent(input$QC1_Task, {
     QC1_Task <<- input$QC1_Task
   })
@@ -99,6 +99,7 @@ server <- function(input, output, session) {
     ))
   
 # KSAO Analysis Panel ---------------------------------------------
+  
   observeEvent(input$QC1_KSAO, {
     QC1_KSAO <<- input$QC1_KSAO
   })
@@ -157,6 +158,7 @@ server <- function(input, output, session) {
   })
 
   # Analysis of KSAO Statements ----------------------------------
+  
   KSAOs_Analyzed <<- eventReactive(input$Analyze_Stuff_ksao, {
     shiny::req(Description.Frame, values$dat_ksao)
     
@@ -192,12 +194,11 @@ server <- function(input, output, session) {
     DA_Limits <<- as.numeric(unlist(strsplit(input$DA_Limits,",")))
   })
   
-# Get duty area weightings
+  # Get duty area weightings
   DutyAreas <<- eventReactive(input$Calculate_Weights, {
-    
-    # Splice DA Limits for Later Inclusion in Table
-    da_df <<- get_da_limits(DA_Limits)
 
+    # This can be automated in the future. Where the string match is, 
+    # there you shall extract from.
     if (input$Where_DA == 'Task Analysis File') {
       get_weightings(values$dat_task)
     } else {
@@ -233,7 +234,8 @@ server <- function(input, output, session) {
     buttons = c('copy', 'csv', 'excel', 'pdf', 'print')
   ))
 
-# Demographics Data Download -----------------------------------------------------------
+# Demographics Data Download ------------------------------------------------
+  
   demo_task_df <<- data.frame(Demographic_Name=character(0),
                               Column_Name=character(0),
                               Analysis_Type=integer(0))
@@ -300,7 +302,7 @@ server <- function(input, output, session) {
 
 # Linkage Analysis Panel --------------------------------------------------
 
-# Upload link SPSS File -----------------------------------------------------
+# Upload link SPSS File ---------------------------------------------------
 
   observeEvent(input$link, {
 
@@ -375,6 +377,7 @@ server <- function(input, output, session) {
     style = "bootstrap",
     server = TRUE,
     options = list(
+      paging = FALSE,
       dom = 'Bfrtip',
       buttons = c('copy', 'csv', 'excel', 'pdf', 'print')
     ))
@@ -387,18 +390,20 @@ server <- function(input, output, session) {
     style = "bootstrap",
     server = TRUE,
     options = list(
+      paging = FALSE,
       dom = 'Bfrtip',
       buttons = c('copy', 'csv', 'excel', 'pdf', 'print')
     ))
   
   # Render Raw JDKL Table.
-  output$pr_linkage_raw_sao <-
+  output$pr_linkage_raw_know <-
     DT::renderDataTable({
       JDKL_Matrix
     },
     style = "bootstrap",
     server = TRUE,
     options = list(
+      paging = FALSE,
       dom = 'Bfrtip',
       buttons = c('copy', 'csv', 'excel', 'pdf', 'print')
     ))
@@ -411,11 +416,13 @@ server <- function(input, output, session) {
     style = "bootstrap",
     server = TRUE,
     options = list(
+      paging = FALSE,
       dom = 'Bfrtip',
       buttons = c('copy', 'csv', 'excel', 'pdf', 'print')
     ))
   
-  # Data Download Parameters ------------------------------------------------
+# Data Download Parameters ------------------------------------------------
+  
   # Result from clicking the Download File.
   output$downloadData <- downloadHandler(
     filename = "JAQ_Workbook.xlsx",

@@ -28,5 +28,4 @@ for (i in list.files('./modules/')) {
 # # Launch the app ----------------------------------------------------------
 # runApp(appDir = getwd(),
 #        launch.browser = TRUE)
-# Test push.
 

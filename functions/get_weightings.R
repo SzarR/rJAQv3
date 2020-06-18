@@ -1,7 +1,5 @@
 get_weightings <- function(datum){
   
-  req(DA_Limits)
-
   if(dutyarea_end %in% colnames(datum)){
 
   # Vector of duty area names
@@ -14,7 +12,7 @@ get_weightings <- function(datum){
   DutyAreaCount <<-  length(DutyAreaVars)
 
   # Duty Area Labels/Names
-  DutyAreaLabels <- 
+  DutyAreaLabels <<- 
     datum %>% 
     select(DutyAreaVars) %>% 
     get_label() %>% 
@@ -28,19 +26,30 @@ get_weightings <- function(datum){
   Ratio_DAR <<- (round((Corrected_DAR / 100), digits = 2))
   Weight_Percent <- paste0(Ratio_DAR * 100, "%")
 
-  Weighting.Frame <- tibble(`Duty Area` = 1:DutyAreaCount,
-                            'Label' = DutyAreaLabels,
-                            'Weight' = Weight_Percent,
-                            'Begin' = da_df[['Begin']],
-                            'End' = da_df[['End']],
-                            'Count' = da_df[['Count']])
+  Weighting.Frame <- tibble('Label' = DutyAreaLabels,
+                            'Weight' = Weight_Percent)
   
-  DutyAreaLabel <<- rep(Weighting.Frame$Label, 
-                    Weighting.Frame$Count)
+  if(length(DA_Limits == DutyAreaCount)) {
+    
+    # Create a vector of duty area labels to cbind to task analysis.
+    da_df <<- get_da_limits(DA_Limits)
+    
+    Weighting.Frame <- tibble('Label' = DutyAreaLabels,
+                              'Weight' = Weight_Percent,
+                              'Begin' = da_df[['Begin']],
+                              'End' = da_df[['End']],
+                              'Count' = da_df[['Count']])
+    
+    DutyAreaDefinitions <<- rep(Weighting.Frame$Label,
+                                Weighting.Frame$Count)
+    
+  } else {
+    make_alert(title = "Error!",
+               text = "Check your duty area limits and try again.",
+               type = 'error')
+    
+  }
   
-  # Make global for reference in LAQ analysis
-  DutyAreaLabels <<- DutyAreaLabels
-
   return(Weighting.Frame)
   
   } else {

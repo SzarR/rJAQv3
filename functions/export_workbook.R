@@ -37,11 +37,13 @@ export_workbook <- function() {
 
 # Task Analysis Export Piece ----------------------------------------------
 
-  if(!is.null(Tasks_Analyzed())){
+  if (rename_begin != "") {
+    
     outs_1 <- Tasks_Analyzed()[,-1]
     
-    # Append Duty area Labels
-    outs_1 <- cbind(outs_1, DutyAreaLabel)
+    if(exists("DutyAreaDefinitions")) {
+      outs_1 <- cbind(outs_1, DutyAreaDefinitions)
+    }
 
     Task_Analysis <-
       xlsx::createSheet(wb = Results_Workbook, sheetName = "Task_Analysis")
@@ -74,24 +76,18 @@ export_workbook <- function() {
   
 # KSAO Analysis Output ----------------------------------------------------
   
-   if (rename_begin_sao != "" |
-       rename_begin_know != "") {
-  #if(!is.null(KSAOs_Analyzed())){
+  if (any(c(rename_begin_know, rename_begin_sao) != "")) {
 
     outs_2 <<- KSAOs_Analyzed()[,-1]
 
     KSAO_Analysis <-
       xlsx::createSheet(wb = Results_Workbook, sheetName = "KSAO_Analysis")
-# 
-#     dfColIndex           <- rep(list(ROWS), dim(outs_2)[2])
-#     names(dfColIndex)    <- seq(1, dim(outs_2)[2], by = 1)
 
     addDataFrame(
       x = outs_2,
       sheet = KSAO_Analysis,
       startRow = 1,
       startColumn = 1,
-      #colStyle = dfColIndex,
       showNA = FALSE,
       colnamesStyle = TABLE_COLNAMES_STYLE,
       rownamesStyle = TABLE_ROWNAMES_STYLE
@@ -108,6 +104,7 @@ export_workbook <- function() {
 # Linkage SAO  ---------------------------------------------
 
   if (rename_begin_link_sao != "") {
+    
     outs_3 <- Link_SAO_Analyzed()
 
     Weighted_SAO <-
@@ -153,6 +150,7 @@ export_workbook <- function() {
   # Linkage Knowledge  ---------------------------------------------
 
   if (rename_begin_link_know != "") {
+    
     outs_4 <- Link_KNOW_Analyzed()
 
     Weighted_KNOW <-
@@ -198,6 +196,7 @@ export_workbook <- function() {
   # Duty Area Weightings  ---------------------------------------------
 
   if (dutyarea_begin != "") {
+    
     outs_da <- DutyAreas()
 
     DutyAreaz <-
@@ -218,7 +217,7 @@ export_workbook <- function() {
     )
 
     setColumnWidth(sheet = DutyAreaz,
-                   colIndex = 3,
+                   colIndex = 2,
                    colWidth = 50) # Change column width
   }
   
@@ -250,5 +249,4 @@ if (nrow(demo_task_df) > 0) {
   }
 
 }
-#return(Results_Workbook) # yes?
 }

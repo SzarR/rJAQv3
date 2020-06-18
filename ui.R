@@ -219,10 +219,10 @@ ui <-
             width = 240
             ))),
         mainPanel(tabsetPanel(type = "tabs",
-                              tabPanel("Data",  DT::dataTableOutput("pr_table_link")),
+                              tabPanel("Data", DT::dataTableOutput("pr_table_link")),
                               tabPanel("SAAL_Raw", DT::dataTableOutput("pr_linkage_raw_sao")),
                               tabPanel("SAAL_Weighted", DT::dataTableOutput("pr_linkage_sao")),
-                              tabPanel("JDKL_Raw", DT::dataTableOutput("pr_xr_sao")),
+                              tabPanel("JDKL_Raw", DT::dataTableOutput("pr_linkage_raw_know")),
                               tabPanel("JDKL_Weighted", DT::dataTableOutput("pr_linkage_know"))
         ))
       ) #sidebar layout
