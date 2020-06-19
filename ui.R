@@ -60,7 +60,8 @@ ui <-
             label = "Task Analyze",
             width = 170
           )), 
-        mainPanel(tabsetPanel(type = "tabs",
+        mainPanel(tabsetPanel(id = "task_tabs",
+                              type = "tabs",
                               tabPanel("Data",  DT::dataTableOutput("pr_table_task")),
                               tabPanel("Task Results", DT::dataTableOutput("pr_task_analysis"))
                               ))
@@ -124,7 +125,8 @@ ui <-
             label = "KSAO Analyze",
             width = 170
           )), 
-        mainPanel(tabsetPanel(type = "tabs",
+        mainPanel(tabsetPanel(id = "ksao_tabs",
+                              type = "tabs",
                               tabPanel("Data",  DT::dataTableOutput("pr_table_ksao")),
                               tabPanel("KSAO Results", DT::dataTableOutput("pr_ksao_analysis"))
         ))

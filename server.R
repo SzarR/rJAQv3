@@ -1,4 +1,6 @@
 server <- function(input, output, session) {
+  
+  options(shiny.maxRequestSize = 30 * 1024 ^ 2) 
 
 # Task Analysis Panel -----------------------------------------------------
   
@@ -63,6 +65,9 @@ server <- function(input, output, session) {
     if(exists("TaskNumbers") == TRUE){
     get_statements(values$dat_task, section = 'task')
     }
+    
+    updateTabsetPanel(session, "task_tabs",
+                      selected = "Task Results")
     
   })
 
@@ -154,6 +159,9 @@ server <- function(input, output, session) {
     values$dat_ksao <- temp
 
     get_statements(values$dat_ksao,section = 'ksao')
+    
+    updateTabsetPanel(session, "ksao_tabs",
+                      selected = "KSAO Results")
 
   })
 

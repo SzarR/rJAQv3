@@ -1,5 +1,7 @@
 laq_analyze <- function(datum, skills=FALSE, knowledge=FALSE) {
   
+  withProgress(message = 'Analyzing Data',value = 0, {
+
 if (skills == TRUE & knowledge == FALSE) {
   
   if(rename_begin_link_sao == "" | rename_end_link_sao == "") {
@@ -14,7 +16,8 @@ if (skills == TRUE & knowledge == FALSE) {
   SAAL_ALI <- colMeans(datum[,LinkStatementNames_SAO], na.rm=TRUE)
   
   SAAL_Matrix <<- matrix(SAAL_ALI, nrow = SAONumbersForLinkage)
-
+  incProgress(amount = 0.2, message = "Calculating Skill Linkage Values")
+  
   # Do multiplication on the created matrix
   SAAL_Weighted_Matrix    <- as.data.frame(sapply(1:ncol(SAAL_Matrix),function(x) Ratio_DAR[x] * SAAL_Matrix[,x]))
 
@@ -64,6 +67,8 @@ if (skills == TRUE & knowledge == FALSE) {
       
     } else {
 
+      incProgress(amount = 0.6, message = "Calculating Job Knowledge Values")
+      
     # Obtain column means.
     JDKL_ALI <- colMeans(datum[,LinkStatementNames_KNOW], na.rm=TRUE)
 
@@ -103,4 +108,5 @@ if (skills == TRUE & knowledge == FALSE) {
     return(JDKL_Weighted_Matrix)
     }
   }
+  })
 }
