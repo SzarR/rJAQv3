@@ -255,6 +255,14 @@ ui <-
              "If rJAQ detects the existence of an analysis, it will
              automatically include that analysis in the downloaded XLSX file.",
              br(),
+             br(),
+             "NOTE: For the Excel download to work correctly, you must have  the
+             rJAQ app loaded in a browser, and NOT in the Rstudio Viewer pane
+             window. If the app loads in a internet browser, such as IE, or
+             Google Chrome, you should be able to make the save. If the app loads
+             inside of RStudio, in the bottom right hand corner, you will not be
+             able to save excel files.",
+             br(),
              selectInput(inputId = "ExporterFormat", 
                          label="Select File Format", 
                          choices = c("XLSX"), 
